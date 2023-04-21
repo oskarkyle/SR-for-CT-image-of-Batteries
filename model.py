@@ -38,6 +38,8 @@ class SRResNet(nn.Module):
             upscale_factor: int
     ) -> None:
         super(SRResNet, self).__init__()
+        # Replace the ordinary convolution in the residual block with a dilated convolution
+        # Remove the batch normalization layer in the residual block
         # Low frequency information extraction layer
         self.conv1 = nn.Sequential(
             nn.Conv2d(in_channels, channels, kernel_size=9, stride=1, padding=0, dilation=2),
