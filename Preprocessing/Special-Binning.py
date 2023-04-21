@@ -44,7 +44,7 @@ def downsampling(image, scale, sigma):
     new_im = Image.fromarray(np.uint8(im_arr_down))
     return new_im
 
-def binning(image, bin_factor):
+def special_binning(image, bin_factor):
     image = Image.open(image)
     im = np.array(image)
     h, w = im.shape[:2]
@@ -57,16 +57,16 @@ def binning(image, bin_factor):
     bin_im = np.mean(im_reshape, axis=(1, 3))
     
     bin_im_blur = cv2.GaussianBlur(bin_im, (3, 3), 0)
-    bin_im_resize = cv2.resize(bin_im_blur, (1000, 1000), interpolation=cv2.INTER_NEAREST)
+    bin_im_resize = cv2.resize(bin_im_blur, (h, w), interpolation=cv2.INTER_NEAREST)
     bin_im_resize = Image.fromarray(np.uint8(bin_im_resize))
     
     return bin_im_resize
 
 if __name__ == "__main__":
-    crop_im = Image.open('crop.jpeg')
-    new_crop = crop(crop_im, 200, 200, 512, 512)
-    #im_down = downsampling('crop.jpeg', 2, 1)
-    #bin_im_resize = binning('crop.jpeg', 2)
-    #im_down.show()
-    #bin_im_resize.show()
-    new_crop.save('new_crop.jpeg')
+    downx2_special_binx2 = downsampling('special_binx2.jpeg', 2, 0)
+    downx4_special_binx2 = downsampling('special_binx2.jpeg', 4, 0)
+    downx8_special_binx2 = downsampling('special_binx2.jpeg', 8, 0)
+
+    downx2_special_binx2.save('downx2.jpeg')
+    downx4_special_binx2.save('downx4.jpeg')
+    downx8_special_binx2.save('downx8.jpeg')
