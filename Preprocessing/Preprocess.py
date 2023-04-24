@@ -2,6 +2,7 @@ import pytiff
 import numpy as np
 from PIL import Image
 import cv2
+import glob
 from Special_binning import *
 from Dataset import *
 
@@ -40,7 +41,7 @@ def crop(image, x, y, h, w):
 def write_data(output_path, images):
     with pytiff.Tiff(output_path, "w") as handle:
         for i in range(len(images)):
-            data = np.array(images[i], np.uint8)
+            data = images[i]
             handle.write(data, method="tile")
 
 
@@ -57,8 +58,9 @@ if __name__ == "__main__":
         im = Image.fromarray(np.uint8(im))
         cropped = crop(im, 200, 200, 512, 512)
         binned = special_binning(cropped, 2)
-
-        binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/sample_{i}.jpeg", "jpeg")
+        
+        #cropped.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/original/sample_{i}.jpeg", "JPEG")
+        #binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/sample_{i}.jpeg", "jpeg")
 
     for i in range(len(images_3)):
         im = images_3[i]
@@ -66,4 +68,10 @@ if __name__ == "__main__":
         cropped = crop(im, 200, 200, 512, 512)
         binned = special_binning(cropped, 2)
 
-        binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/XTM_raw/sample_{i}.jpeg", "jpeg")
+        #cropped.save(f"/Users/haoruilong/Dataset for Battery/Pristine/XTM_raw/original/sample_{i}.jpeg", "JPEG")
+        #binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/XTM_raw/sample_{i}.jpeg", "jpeg")
+    
+    #outpath_2 = "/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/PTY_raw_512.tif"
+    #out_im = [cv2.imread(file) for file in glob.glob("/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/bin_2/*.jpeg")]
+
+    #write_data(outpath_2, out_im)

@@ -27,8 +27,8 @@ class MyDataModule(L.LightningDataModule):
 
     def setup(self, stage=None) -> None:
         # To create train set and val set
-        self.train_dataset = MyDataset(os.path.join(self.data_path, 'train'))
-        self.val_dataset = MyDataset(os.path.join(self.data_path, 'val'))
+        self.train_dataset = MyDataset(os.path.join(self.data_path, 'bin_2'))
+        self.val_dataset = MyDataset(os.path.join(self.data_path, 'original'))
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, batch_size = self.batch_size, shuffle = True, num_workers=4, pin_memory=True)    
