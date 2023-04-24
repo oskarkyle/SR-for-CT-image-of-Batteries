@@ -2,6 +2,8 @@ import pytiff
 import numpy as np
 from PIL import Image
 import cv2
+from Special_binning import *
+from Dataset import *
 
 # Load data
 def load_data(path):
@@ -14,7 +16,6 @@ def load_data(path):
             images.append(im)
     
     return images
-
 
 # Binning image
 def binning(image, bin_factor, size):
@@ -32,7 +33,7 @@ def binning(image, bin_factor, size):
 def crop(image, x, y, h, w):
     image = np.array(image)
     crop_im = image[y:y+h, x:x+w]
-    crop_im = Image.fromarray(crop_im)
+    crop_im = Image.fromarray(np.uint8(crop_im))
 
     return crop_im
 
@@ -44,28 +45,25 @@ def write_data(output_path, images):
 
 
 if __name__ == "__main__":
-    path = "/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM_pristine_segmentation.tif"
-    images = []
-    bin_imgs = []
+    path1 = "/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM_pristine_segmentation.tif"
+    path2 = "/Users/haoruilong/Dataset for Battery/Pristine/PTY_pristine_raw.tif"
+    path3 = "/Users/haoruilong/Dataset for Battery/Pristine/XTM_pristine_raw.tif"
+
+    images_2 = load_data(path2)
+    images_3 = load_data(path3)
     
-    images = load_data(path)
-    
-    for i in range(len(images)):
-        im = images[i]
-        crop_im1 = crop(im, 0, 0, 1000, 1000)
-        crop_im2 = crop(im, 0, 1000, 1000, 1000)
-        crop_im3 = crop(im, 1000, 0, 1000, 1000)
-        crop_im4 = crop(im, 1000, 1000, 1000, 1000)
+    for i in range(len(images_2)):
+        im = images_2[i]
+        im = Image.fromarray(np.uint8(im))
+        cropped = crop(im, 200, 200, 512, 512)
+        binned = special_binning(cropped, 2)
 
-        bin_im1 = binning(crop_im1, 2, 1000)
-        bin_im2 = binning(crop_im2, 2, 1000)
-        bin_im3 = binning(crop_im3, 2, 1000)
-        bin_im4 = binning(crop_im4, 2, 1000)
+        binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_raw/sample_{i}.jpeg", "jpeg")
 
-        bin_img = [bin_im1, bin_im2, bin_im3, bin_im4]
-        bin_imgs.append(bin_img)
+    for i in range(len(images_3)):
+        im = images_3[i]
+        im = Image.fromarray(np.uint8(im))
+        cropped = crop(im, 200, 200, 512, 512)
+        binned = special_binning(cropped, 2)
 
-        bin_im1.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM/Bin_2/sample_{i}_1.jpeg", "JPEG")
-        bin_im2.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM/Bin_2/sample_{i}_2.jpeg", "JPEG")
-        bin_im3.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM/Bin_2/sample_{i}_3.jpeg", "JPEG")
-        bin_im4.save(f"/Users/haoruilong/Dataset for Battery/Pristine/PTY_XTM/Bin_2/sample_{i}_4.jpeg", "JPEG")
+        binned.save(f"/Users/haoruilong/Dataset for Battery/Pristine/XTM_raw/sample_{i}.jpeg", "jpeg")
