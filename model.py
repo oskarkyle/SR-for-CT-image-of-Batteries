@@ -21,10 +21,12 @@ from torch.nn import functional as F_torch
 from torchvision import models
 from torchvision import transforms
 from torchvision.models.feature_extraction import create_feature_extractor
+import lightning as L
 
 __all__ = [
     "SRResNet", "Discriminator",
     "srresnet_x4", "discriminator", "content_loss",
+    "SRCNN", "LitModel"
 ]
 
 
@@ -42,7 +44,7 @@ class SRResNet(nn.Module):
         # Remove the batch normalization layer in the residual block
         # Low frequency information extraction layer
         self.conv1 = nn.Sequential(
-            nn.Conv2d(in_channels, channels, kernel_size=9, stride=1, padding=0, dilation=2),
+            nn.Conv2d(in_channels, channels, kernel_size=9, stride=1, padding=9//2, dilation=2),
             nn.ReLU(),
         )
 
@@ -54,7 +56,7 @@ class SRResNet(nn.Module):
 
         # High-frequency information linear fusion layer
         self.conv2 = nn.Sequential(
-            nn.Conv2d(channels, channels,kernel_size=3, stride=1, padding=0, dilation=2, bias=False),
+            nn.Conv2d(channels, channels,kernel_size=3, stride=1, padding=1, dilation=2, bias=False),
             nn.ReLU(),
         )
 
@@ -251,3 +253,32 @@ def content_loss(**kwargs: Any) -> _ContentLoss:
     content_loss = _ContentLoss(**kwargs)
 
     return content_loss
+
+class SRCNN(nn.Module):
+    def __init__(self, num_channels=1) -> None:
+        super().__init__()
+        self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=9, stride=1, padding=9//2)
+        self.conv2 = nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=5//2)
+        self.conv3 = nn.Conv2d(32, num_channels, kernel_size=3, stride=1, padding=1)
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        x = self.relu(self.conv1(x))
+        x = self.relu(self.conv2(x))
+        x = self.conv3(x)
+
+        return x
+    
+class LitModel(L.LightningModule):
+    def __init__(self, SRCNN) -> None:
+        super().__init__()
+        self.SRCNN = SRCNN
+        
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.MSELoss(y_hat, y)
+        return loss
+    
+    def configure_optimizers(self) -> Any:
+        return super().configure_optimizers()
