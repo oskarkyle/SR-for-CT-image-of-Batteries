@@ -281,4 +281,7 @@ class LitModel(L.LightningModule):
         return loss
     
     def configure_optimizers(self) -> Any:
-        return super().configure_optimizers()
+        return torch.optim.Adam(self.parameters(), lr=1e-4)
+    
+    def forward(self, image) -> Any:
+        return self.SRCNN(image)
