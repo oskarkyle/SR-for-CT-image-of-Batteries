@@ -26,7 +26,7 @@ import lightning as L
 __all__ = [
     "SRResNet", "Discriminator",
     "srresnet_x4", "discriminator", "content_loss",
-    "SRCNN", "LitModel"
+    "SRCNN", "MyModel"
 ]
 
 
@@ -269,19 +269,28 @@ class SRCNN(nn.Module):
 
         return x
     
-class LitModel(L.LightningModule):
-    def __init__(self, SRCNN) -> None:
+class MyModel(L.LightningModule):
+    def __init__(self, num_channels=1) -> None:
         super().__init__()
-        self.SRCNN = SRCNN
-        
+        self.conv1 = nn.Conv2d(num_channels, 64, kernel_size=9, stride=1, padding=9//2)
+        self.conv2 = nn.Conv2d(64, 32, kernel_size=5, stride=1, padding=5//2)
+        self.conv3 = nn.Conv2d(32, num_channels, kernel_size=3, stride=1, padding=1)
+        self.relu = nn.ReLU(inplace=True)
+
+    def forward(self, x):
+        x = self.relu(self.conv1(x))
+        x = self.relu(self.conv2(x))
+        x = self.conv3(x)
+
+        return x
+    
     def training_step(self, batch, batch_idx):
         x, y = batch
         y_hat = self(x)
         loss = nn.MSELoss(y_hat, y)
+        self.log('train_loss', loss)
         return loss
     
-    def configure_optimizers(self) -> Any:
-        return torch.optim.Adam(self.parameters(), lr=1e-4)
-    
-    def forward(self, image) -> Any:
-        return self.SRCNN(image)
+    def configure_optimizers(self):
+        optimizer = torch.optim.Adam(self.parameters(), lr=0.01)
+        return optimizer
