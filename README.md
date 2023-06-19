@@ -1,3 +1,4 @@
 ### Problems:
 
-1. How to match data and label in BaseDataset.py
+1. Training with colab
+2. Hyperparameter
