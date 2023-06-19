@@ -1,0 +1,16 @@
+# Ignore any generated files or directories
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+lightning_logs/
+images/
+Dataset/
+./model/BaseModel.py 
+outputs/
+
+# Ignore any contents in Preprocessing directories
+./Preprocessing/__pycache__/
+./Preprocessing/Images/
