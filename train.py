@@ -56,7 +56,7 @@ mydataloader = DataLoader(mydataset, batch_size=args.batch_size, shuffle=True)
 train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
-
+"""
 # Test if dataloader successful is
 print('length of train_dataset: ', train_dataset.__len__())
 print('length of my dataset: ', length_dataset)
@@ -68,10 +68,10 @@ print('total page count for each tiff file:', page_count)
 for batch in mydataloader:
     inputs, labels = batch
     pass
-
-
-
 """
+
+
+
 # Train the model
 cudnn.benchmark = True
 device = torch.device("mps")
@@ -143,4 +143,3 @@ for epoch in range(args.num_epochs):
     
 print('best epoch: {}, psnr: {:.2f}'.format(best_epoch, best_psnr))
 torch.save(best_weight, os.path.join(outputs_path, 'best.pth'))
-"""
