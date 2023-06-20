@@ -68,10 +68,9 @@ print('total page count for each tiff file:', page_count)
 for batch in mydataloader:
     inputs, labels = batch
     pass
+
+
 """
-
-
-
 # Train the model
 cudnn.benchmark = True
 device = torch.device("mps")

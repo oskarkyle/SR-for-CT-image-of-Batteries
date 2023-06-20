@@ -135,11 +135,13 @@ class BaseDataset(DS):
         # Postion in grid to locate a tile in current page
         tiling_grid_info = self.tiling_grid_in_each_tiff[tifffile_index]
         sequence_number_of_tile_in_page = tile_offset_in_current_tifffile - tiling_grid_info[0] * tiling_grid_info[1] * page_index
+        """
         print("tile_offset_in_current_tifffile:", tile_offset_in_current_tifffile)
         print("page index:", page_index)
         print("tiling grid:", tiling_grid_info)
         print("sequence number of tile in page:", sequence_number_of_tile_in_page)
         print("tiff_file index:", tifffile_index)
+        """
         return tifffile_index,page_index,sequence_number_of_tile_in_page
 
 
