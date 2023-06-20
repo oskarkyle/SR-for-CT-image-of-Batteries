@@ -123,7 +123,7 @@ class BaseDataset(DS):
         while left <= right:
             mid = (left + right) // 2
 
-            if self.tiff_intersection_border[mid] < idx:
+            if self.tiff_intersection_border[mid] <= idx:
                 tifffile_index = mid
                 left = mid + 1
             else:
@@ -135,10 +135,11 @@ class BaseDataset(DS):
         # Postion in grid to locate a tile in current page
         tiling_grid_info = self.tiling_grid_in_each_tiff[tifffile_index]
         sequence_number_of_tile_in_page = tile_offset_in_current_tifffile - tiling_grid_info[0] * tiling_grid_info[1] * page_index
-        # print("tile_offset_in_current_tifffile:", tile_offset_in_current_tifffile)
-        # print("page index:", page_index)
-        # print("tiling grid:", tiling_grid_info)
-        # print("sequence number of tile in page:", sequence_number_of_tile_in_page)
+        print("tile_offset_in_current_tifffile:", tile_offset_in_current_tifffile)
+        print("page index:", page_index)
+        print("tiling grid:", tiling_grid_info)
+        print("sequence number of tile in page:", sequence_number_of_tile_in_page)
+        print("tiff_file index:", tifffile_index)
         return tifffile_index,page_index,sequence_number_of_tile_in_page
 
 
@@ -256,8 +257,9 @@ class BaseDataset(DS):
         """
         print("Number of dimensions:", raw_data.dim())
         print("Size of each dimension:", raw_data.size())
-        """
+
         raw_data_float = torch.tensor(raw_data.clone().detach(), dtype=torch.float32)
+        """
         data = raw_data
         
         
@@ -277,7 +279,6 @@ class BaseDataset(DS):
         if self.transform:
             data, label = self.transform(data, label)
  
-
         """
         original = raw_data.squeeze().numpy()
         binning = data.squeeze().numpy()
@@ -329,8 +330,9 @@ if __name__ == "__main__":
     length_dataset = mydataset.__len__()
     print(length_dataset)
     mydataloader = DataLoader(mydataset, batch_size=3, shuffle=True)
+
     for batch in mydataloader:
         pass
-    
-    #sample = mydataset.__getitem__(4500)
-"""
+
+    sample = mydataset.__getitem__(8352)
+    """

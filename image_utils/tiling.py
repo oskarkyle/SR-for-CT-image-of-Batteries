@@ -114,7 +114,7 @@ def split(image, tile_size,pic_identifier):
 def get_tile_by_sequence_number(image,tile_size,sequence_number):
      height, width = image.shape[:2]
      h_tiles,w_tiles = get_tiling_grid(image,tile_size)
-     # print("tiles",h_tiles,w_tiles)
+     # print("tiles:",h_tiles,w_tiles)
      position_h = sequence_number // h_tiles
      position_w = sequence_number % w_tiles
      
@@ -136,18 +136,3 @@ def get_tile_by_sequence_number(image,tile_size,sequence_number):
          raise ValueError
      
 
-"""image = np.random.randint(0, 255, size=(2250, 1280, 3), dtype=np.uint8)
-tiles = tile_image(image, 256,2)
-for tile in tiles:
-     tile.list_info()"""
-
-
-"""height, width = image.shape[:2]
-    h_tiles = height // tile_size[0]
-    w_tiles = width // tile_size[1]
-    tiles = np.empty((h_tiles, w_tiles) + tile_size, dtype=image.dtype)
-    for h in range(h_tiles):
-        for w in range(w_tiles):
-            tile = image[h*tile_size[0]:(h+1)*tile_size[0], w*tile_size[1]:(w+1)*tile_size[1]]
-            tiles[h, w] = tile
-    return tiles"""  
