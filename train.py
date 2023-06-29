@@ -16,6 +16,7 @@ from model.Unet import *
 from image_utils.utils import * 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-m', '--model', dest='model', type=str, default='SRCNN')
 parser.add_argument('-s', '--size', dest='size', type = int, help='The size of each tile in pages in tiff', default=256)
 parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
@@ -75,14 +76,24 @@ for batch in mydataloader:
 cudnn.benchmark = True
 device = torch.device("mps")
 # If the model is SRCNN
-model = SRCNN().to(device)
-criterion = nn.MSELoss()
-optimizer = optim.Adam([
-    {'params': model.conv1.parameters()},
-    {'params': model.conv2.parameters()},
-    {'params': model.conv3.parameters(), 'lr': args.lr * 0.1}
-    ], lr=args.lr)
+if args.model == "SRCNN":
 
+    model = SRCNN().to(device)
+    optimizer = optim.Adam([
+        {'params': model.conv1.parameters()},
+        {'params': model.conv2.parameters()},
+        {'params': model.conv3.parameters(), 'lr': args.lr * 0.1}
+        ], lr=args.lr)
+    
+elif args.model == "Unet":
+    model = Unet().to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+
+else:
+    raise NotImplementedError
+
+
+criterion = nn.MSELoss()
 best_weight = copy.deepcopy(model.state_dict())
 best_epoch = 0
 best_psnr = 0.0
@@ -119,6 +130,7 @@ for epoch in range(args.num_epochs):
     
     torch.save(model.state_dict(), os.path.join(outputs_path, 'epoch_{}.pth'.format(epoch)))
 
+    """
     model.eval()
     epoch_psnr = AverageMeter()
 
@@ -139,6 +151,30 @@ for epoch in range(args.num_epochs):
         best_epoch = epoch
         best_psnr = epoch_psnr.avg
         best_weight = copy.deepcopy(model.state_dict())
-    
+    """
+
+    model.eval()
+    eval_epoch_losses = AverageMeter()
+
+    for batch in tqdm(test_dataloader, desc='eval...'):
+        inputs, labels = batch
+
+        inputs = inputs.to(device)
+        labels = labels.to(device)
+
+        with torch.no_grad():
+            preds = model(inputs).clamp(0.0, 0.1)
+
+        eval_loss = criterion(preds, labels)
+
+        eval_epoch_losses.update(eval_loss.item(), len(inputs))
+
+    print('eval psnr: {:.2f}'.format(eval_epoch_losses.avg))
+
+    if eval_epoch_losses.avg > best_psnr:
+        best_epoch = epoch
+        best_psnr = eval_epoch_losses.avg
+        best_weight = copy.deepcopy(model.state_dict()) 
+
 print('best epoch: {}, psnr: {:.2f}'.format(best_epoch, best_psnr))
 torch.save(best_weight, os.path.join(outputs_path, 'best.pth'))

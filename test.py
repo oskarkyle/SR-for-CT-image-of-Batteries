@@ -5,8 +5,8 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 import PIL.Image as pil_image
 
-from models import SRCNN
-from utils import convert_rgb_to_ycbcr, convert_ycbcr_to_rgb, calc_psnr
+from model.SRCNN import *
+from image_utils.utils import convert_rgb_to_ycbcr, convert_ycbcr_to_rgb, calc_psnr
 
 
 if __name__ == '__main__':
@@ -17,7 +17,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     cudnn.benchmark = True
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('mps')
 
     model = SRCNN().to(device)
 

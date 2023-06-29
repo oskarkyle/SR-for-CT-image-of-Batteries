@@ -29,7 +29,7 @@ class deconv2d_bn(nn.Module):
         return out
 
 class Unet(nn.Module):
-    def __init__(self,n_channels, out_channels):
+    def __init__(self,n_channels=1, out_channels=1):
         super(Unet, self).__init__()
         self.n_channels = n_channels
         self.out_channels = out_channels

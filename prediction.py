@@ -82,11 +82,44 @@ for batch in test_dataloader:
     labels = labels.to(device)
 
     preds = model(inputs)
+
+    num_images_inputs = inputs.shape[0]
+    num_images_preds = preds.shape[0]
+    if num_images_inputs == num_images_preds:
+        num_images = num_images_preds
+        print(num_images)
+        
+    for i in range(num_images):
+        input = inputs[i]
+        label = labels[i]
+        pred = preds[i]
+        
+        input = input.squeeze().cpu().numpy()
+        label = label.squeeze().cpu().numpy()
+        pred = pred.detach().squeeze().cpu().numpy()
+
+
+        fig, axes = plt.subplots(1, 3)#, figsize=(10, 8)
+
+        axes[0].imshow(input, cmap='gray')
+        axes[0].set_title('input')
+
+        axes[1].imshow(pred, cmap='gray')
+        axes[1].set_title('pred')
+
+        axes[2].imshow(label, cmap='gray')
+        axes[2].set_title('label')
+
+        plt.tight_layout(pad=0.5)
+        plt.show()
+
+    """
     mse = evaluate_mse(inputs, labels)
     mean_mse = mse.mean().item()  # Average MSE across the batch
     print(f"Mean Squared Error: {mean_mse}")
     # Choose the lowest mse in loop
     if mean_mse < min_mse:
         min_mse = mean_mse
+    """
 
-print(f"Lowest Mean Squared Error: {min_mse}")
+# print(f"Lowest Mean Squared Error: {min_mse}")
