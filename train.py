@@ -101,6 +101,7 @@ best_psnr = 0.0
 for epoch in range(args.num_epochs):
     model.train()
     epoch_losses = AverageMeter()
+    train_losses = []
 
 
 
@@ -127,7 +128,8 @@ for epoch in range(args.num_epochs):
 
             t.set_postfix(loss='{:.6f}'.format(epoch_losses.avg))
             t.update(len(inputs))
-    
+            train_losses.append(epoch_losses.avg)
+
     torch.save(model.state_dict(), os.path.join(outputs_path, 'epoch_{}.pth'.format(epoch)))
 
     """
@@ -176,5 +178,12 @@ for epoch in range(args.num_epochs):
         best_psnr = eval_epoch_losses.avg
         best_weight = copy.deepcopy(model.state_dict()) 
 
+
 print('best epoch: {}, psnr: {:.2f}'.format(best_epoch, best_psnr))
 torch.save(best_weight, os.path.join(outputs_path, 'best.pth'))
+
+plt.plot(train_losses)
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training Loss')
+plt.show()
