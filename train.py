@@ -94,7 +94,7 @@ elif args.model == "Unet":
 elif args.model == "UNet":
     model = UNet(n_channels=1, n_classes=1, bilinear=args.bilinear).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    
+
 else:
     raise NotImplementedError
 
@@ -191,5 +191,5 @@ torch.save(best_weight, os.path.join(outputs_path, 'best.pth'))
 plt.plot(train_losses)
 plt.xlabel('Iteration')
 plt.ylabel('Loss')
-plt.title('Training Loss')
-plt.show()
+plt.title('Training Loss for {}'.format(args.model))
+plt.savefig('./outputs')
