@@ -14,6 +14,7 @@ from BaseDataset import *
 from model.SRCNN import *
 from model.Unet import * 
 from image_utils.utils import * 
+from unet import UNet
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-m', '--model', dest='model', type=str, default='SRCNN')
@@ -21,6 +22,7 @@ parser.add_argument('-s', '--size', dest='size', type = int, help='The size of e
 parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
 parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=32)
+parser.add_argument('-bi', '--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
 args = parser.parse_args()
 
 # Prepare dataloader for training and testing
@@ -89,6 +91,10 @@ elif args.model == "Unet":
     model = Unet().to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
+elif args.model == "UNet":
+    model = UNet(n_channels=1, n_classes=1, bilinear=args.bilinear).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.lr)
+    
 else:
     raise NotImplementedError
 
@@ -183,7 +189,7 @@ print('best epoch: {}, psnr: {:.2f}'.format(best_epoch, best_psnr))
 torch.save(best_weight, os.path.join(outputs_path, 'best.pth'))
 
 plt.plot(train_losses)
-plt.xlabel('Epoch')
+plt.xlabel('Iteration')
 plt.ylabel('Loss')
 plt.title('Training Loss')
 plt.show()
