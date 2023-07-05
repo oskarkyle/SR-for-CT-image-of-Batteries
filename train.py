@@ -78,6 +78,15 @@ for batch in mydataloader:
 
 
 """
+logger.info(f'''Starting training:
+    Epochs:          {args.num_epochs}
+    Batch size:      {args.batch_size}
+    Learning rate:   {args.lr}
+    Binning factor:  {args.binning_factor}
+    Training size:   {train_dataset.__len__()}
+    Validation size: {test_dataset.__len__()} 
+    ''')
+
 # Train the model
 cudnn.benchmark = True
 device = torch.device("mps")
