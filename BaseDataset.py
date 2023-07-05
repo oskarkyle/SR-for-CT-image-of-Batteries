@@ -12,7 +12,6 @@ from torch.utils.data import DataLoader
 from transform.Transforms import Transforms
 from preprocess.Preprocessor import Preprocessor
 
-import pytiff
 import tifffile
 from PIL import Image
 from image_utils import tiling

@@ -9,7 +9,6 @@ import torch.backends.cudnn as cudnn
 import torch.utils.data as data_utils
 from tqdm import tqdm
 
-from Dataset import *
 from BaseDataset import * 
 from model.SRCNN import *
 from model.Unet import * 
@@ -23,7 +22,7 @@ parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
 parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=32)
 parser.add_argument('-bi', '--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
-parser.add_argument('-bf', '--binning_factor',dest='binning_factor', type=int, default=4, help='Value for parameter 1')
+parser.add_argument('-bf', '--binning_factor',dest='binning_factor', type=int, default=4, help='Value for binning factor')
 args = parser.parse_args()
 
 # Prepare dataloader for training and testing
@@ -205,4 +204,4 @@ plt.plot(train_losses)
 plt.xlabel('Iteration')
 plt.ylabel('Loss')
 plt.title('Training Loss for {} with binning factor: {}'.format(args.model, args.binning_factor))
-plt.savefig('./outputs')
+plt.savefig('./outputs/model_{}.png'.format(args.model))
