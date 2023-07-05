@@ -23,6 +23,7 @@ parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
 parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=32)
 parser.add_argument('-bi', '--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
+parser.add_argument('-bf', '--binning_factor',dest='binning_factor', type=int, default=4, help='Value for parameter 1')
 args = parser.parse_args()
 
 # Prepare dataloader for training and testing
@@ -43,7 +44,10 @@ else:
 if os.path.exists(cfgs_path_t):
     transform_cfgs = OmegaConf.load(cfgs_path_t)
 else:
-    preprocess_cfgs = None
+    transform_cfgs = None
+
+OmegaConf.update(preprocess_cfgs, 'binning.binning_factor', args.binning_factor)
+
 
 # Dataset for all, size: 256*256
 mydataset = BaseDataset('SR', 'train', args.size, dataset_dir, data_root, None, preprocess_cfgs)
