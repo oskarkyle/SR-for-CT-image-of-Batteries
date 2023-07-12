@@ -8,7 +8,6 @@ build/
 lightning_logs/
 images/
 Dataset/
-./model/BaseModel.py 
 outputs/
 .DS_Store
 

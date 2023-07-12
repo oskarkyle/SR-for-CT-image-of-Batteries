@@ -11,7 +11,6 @@ from tqdm import tqdm
 
 from BaseDataset import * 
 from model.SRCNN import *
-from model.Unet import * 
 from image_utils.utils import * 
 from unet import UNet
 
@@ -99,9 +98,6 @@ if args.model == "SRCNN":
         {'params': model.conv3.parameters(), 'lr': args.lr * 0.1}
         ], lr=args.lr)
     
-elif args.model == "Unet":
-    model = Unet().to(device)
-    optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
 elif args.model == "UNet":
     model = UNet(n_channels=1, n_classes=1, bilinear=args.bilinear).to(device)

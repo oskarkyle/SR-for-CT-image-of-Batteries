@@ -11,7 +11,7 @@ from omegaconf import DictConfig, OmegaConf
 from timm.scheduler.scheduler import Scheduler
 from torch.optim import Optimizer
 
-# from src.optimizer.lr_scheduler.NoamScheduler import NoamLR
+###from src.optimizer.lr_scheduler.NoamScheduler import NoamLR
 
 
 class PLModel(L.LightningModule):
@@ -56,7 +56,6 @@ class PLModel(L.LightningModule):
         eps = optim_cfg.get("eps", 1e-9)
         weight_decay = optim_cfg.get("weight_decay", 1e-3)
         momentum = optim_cfg.get("momentum", 0.9)
-
         # https://gist.github.com/gautierdag/925760d4295080c1860259dba43e4c01
         if self.optimizer_type == "adam":
             optimizer = torch.optim.Adam(self.model.parameters(), maximize=optim_cfg.maximize, lr=self.learning_rate, betas=betas, eps=eps)
@@ -99,14 +98,14 @@ class PLModel(L.LightningModule):
                     "monitor": scheduler_cfg.monitor
                 }
             )
-        elif scheduler_cfg.type == "noam":
-            scheduler = (
-                {
-                    "scheduler": NoamLR(optimizer=optimizer, warmup_steps=scheduler_cfg.warmup),
-                    "interval": "step",  # runs per batch rather than per epoch
-                    "frequency": 1,
-                }
-            )
+        #elif scheduler_cfg.type == "noam":
+            #scheduler = (
+               #{
+                    #"scheduler": NoamLR(optimizer=optimizer, warmup_steps=scheduler_cfg.warmup),
+                    #"interval": "step",  # runs per batch rather than per epoch
+                    #"frequency": 1,
+                #}
+            #)
         elif scheduler_cfg.type == "cosine":
             scheduler = (
                 {
@@ -129,7 +128,7 @@ class PLModel(L.LightningModule):
         return output
 
     def _training_step(self, batch, batch_idx):
-        paths, X, y = batch
+        paths, X, y = batch 
         logger.debug(f"please implement training_step() for {self._get_name()}!")
 
     def validation_step(self, batch, batch_idx):
