@@ -6,13 +6,12 @@ import torch
 from torch import nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
-import torch.utils.data as data_utils
+from omegaconf import DictConfig, ListConfig, OmegaConf
 from tqdm import tqdm
+import pytorch_lightning as L
 
-from BaseDataset import * 
-from model.SRCNN import *
-from image_utils.utils import * 
-from unet import UNet
+from unet.ConvUNet import ConvUNet
+from data_utils import prepare_data
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-m', '--model', dest='model', type=str, default='SRCNN')
@@ -21,14 +20,12 @@ parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
 parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=32)
 parser.add_argument('-bi', '--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
-parser.add_argument('-bf', '--binning_factor',dest='binning_factor', type=int, default=4, help='Value for binning factor')
 args = parser.parse_args()
 
 # Prepare dataloader for training and testing
 # Data path
-data_root = '/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries'
-dataset_dir = ['/Dataset/Pristine']
-outputs_path = '/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries/outputs'
+data_root = f'H:\SR_for_CT_image_of_Batteries'
+dataset_dir = [f'\dataset\pristine']
 
 # Prepare configurations for dataset
 cfgs_path_p = data_root + '/configs/preprocess.yaml'
@@ -44,47 +41,14 @@ if os.path.exists(cfgs_path_t):
 else:
     transform_cfgs = None
 
-OmegaConf.update(preprocess_cfgs, 'binning.binning_factor', args.binning_factor)
+dataset = prepare_data.prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, args.size)
+train_dataloader, test_dataloader = prepare_data.prepare_dataloader(dataset, args.batch_size)
 
+model = ConvUNet(image_channels=1, output_channels=1)
+trainer = L.Trainer(max_epochs=args.num_epochs)
+trainer.fit(model, train_dataloader)
 
-# Dataset for all, size: 256*256
-mydataset = BaseDataset('SR', 'train', args.size, dataset_dir, data_root, None, preprocess_cfgs)
-
-# Data splitting
-length_dataset = mydataset.__len__()
-train_size = int(0.8 * length_dataset)
-test_size = length_dataset - train_size
-
-train_dataset, test_dataset = data_utils.random_split(mydataset, [train_size, test_size])
-# Apply train and test dataset in dataloader
-mydataloader = DataLoader(mydataset, batch_size=args.batch_size, shuffle=True)
-train_dataloader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-test_dataloader = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
-
-"""
-# Test if dataloader successful is
-print('length of train_dataset: ', train_dataset.__len__())
-print('length of my dataset: ', length_dataset)
-
-page_count = mydataset.get_pages_count_in_tile('./Dataset/Pristine/PTY_pristine_raw.tif')
-print('total page count for each tiff file:', page_count)
-
-
-for batch in mydataloader:
-    inputs, labels = batch
-    pass
-
-
-"""
-logger.info(f'''Starting training:
-    Epochs:          {args.num_epochs}
-    Batch size:      {args.batch_size}
-    Learning rate:   {args.lr}
-    Binning factor:  {args.binning_factor}
-    Training size:   {train_dataset.__len__()}
-    Validation size: {test_dataset.__len__()} 
-    ''')
-
+'''
 # Train the model
 cudnn.benchmark = True
 device = torch.device("mps")
@@ -201,3 +165,4 @@ plt.xlabel('Iteration')
 plt.ylabel('Loss')
 plt.title('Training Loss for {} with binning factor: {}'.format(args.model, args.binning_factor))
 plt.savefig('./outputs/model_{}.png'.format(args.model))
+'''

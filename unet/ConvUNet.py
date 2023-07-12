@@ -1,14 +1,17 @@
-from typing import Tuple, Union, List
+from typing import Tuple, Union, List, Sequence
 from loguru import logger
 from omegaconf import DictConfig
 import pytorch_lightning as L
+from timm.scheduler.scheduler import Scheduler
+from torch.optim import Optimizer
 
+import os
 import torch
 from torch import nn
-
+from torchsummary import summary
 #from src.model.base.BaseModel import PLModel
 
-from blocks import Swish, ConvBlock, SkipConnection, CombineConnection
+from unet.blocks import Swish, ConvBlock, SkipConnection, CombineConnection
 #from model.activations.activation import Swish
 
 class ConvUNet(L.LightningModule):
@@ -50,6 +53,9 @@ class ConvUNet(L.LightningModule):
                  kernel_size: int = 3,
                  n_groups: int = 32,
                  verbose: bool = True,
+                 lr: float = 1e-3,
+                 optimizer_type: str = "adam",
+                 maximize: bool = False,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.verbose = verbose
@@ -64,6 +70,9 @@ class ConvUNet(L.LightningModule):
         self.scale_factor = scale_factor
         self.kernel_size = kernel_size
         self.n_groups = n_groups
+        self.learning_rate = lr
+        self.optimizer_type = optimizer_type
+        self.maximize = maximize
 
 
         if verbose:
@@ -153,5 +162,141 @@ class ConvUNet(L.LightningModule):
         y = self(x)
         self.verbose: logger.success(f"Done: Test passed")
 
-model = ConvUNet(image_channels=1, output_channels=1)
-model.test_model(torch.rand(8, 1, 256, 256))
+    def configure_optimizers(self) -> Tuple[Union[Optimizer, Sequence[Optimizer]], Union[Scheduler, Sequence[Scheduler]]]:
+        """
+        Configure the optimizer and learning rate scheduler for the Lightning module.
+
+        Returns:
+            A tuple containing one or two elements, depending on whether a learning rate scheduler is used or not.
+            The first element is an optimizer or a list of optimizers.
+            The second element is a learning rate scheduler or a list of learning rate schedulers.
+        """
+        logger.info('configure optimizer')
+        #optim_cfg: DictConfig = self.cfg.Optimizer
+
+        #self.learning_rate = lr#optim_cfg.lr
+        logger.opt(ansi=True).info(f"learning rate: <yellow>{self.learning_rate}</>")
+        #self.optimizer_type = optim_cfg.optimizer.lower()
+        logger.opt(ansi=True).info(f"optimizer: <yellow>{self.optimizer_type}</>")
+        '''if optim_cfg.maximize:
+            logger.opt(ansi=True).info(f"optimizer strategy: <yellow>maximize</>")
+        else:
+            logger.opt(ansi=True).info(f"optimizer strategy: <yellow>minimize</>")'''
+        if self.maximize:
+            logger.opt(ansi=True).info(f"optimizer strategy: <yellow>maximize</>")
+        else:
+            logger.opt(ansi=True).info(f"optimizer strategy: <yellow>minimize</>")
+
+        betas = (0.9, 0.98)#optim_cfg.get("betas", (0.9, 0.98)
+        eps = 1e-9#optim_cfg.get("eps", 1e-9)
+        weight_decay = 1e-3#optim_cfg.get("weight_decay", 1e-3)
+        momentum = 0.9#optim_cfg.get("momentum", 0.9)
+        # https://gist.github.com/gautierdag/925760d4295080c1860259dba43e4c01
+        if self.optimizer_type == "adam":
+            optimizer = torch.optim.Adam(self.model.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, eps=eps)
+        elif self.optimizer_type == "adamw":
+            optimizer = torch.optim.AdamW(self.model.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
+        elif self.optimizer_type == "sgd":
+            optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=momentum)
+        elif self.optimizer_type == "nadam":
+            optimizer = torch.optim.NAdam(self.model.parameters(), lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
+        else:
+            logger.exception(f"illegal optimizer: {self.optimizer_type} - suppported optimizer: adam, adamw, sgd, nadam")
+            raise ValueError(f"illegal optimizer: {self.optimizer_type} - suppported optimizer: adam, adamw, sgd, nadam")
+
+        logger.success('Done: configure optimizer.')
+        return [optimizer]
+        '''scheduler_cfg = optim_cfg.Scheduler
+
+        if scheduler_cfg.type is None or scheduler_cfg.type == "none":
+            logger.success('Done: configure optimizer.')
+            return [optimizer]
+
+        logger.opt(ansi=True).info(f'scheduler: <yellow>{scheduler_cfg.type}</>')
+        if scheduler_cfg.type == 'linear':
+            scheduler = (
+                {
+                    "scheduler": torch.optim.lr_scheduler.LinearLR(optimizer=optimizer,
+                                                                   start_factor=scheduler_cfg.start_f,
+                                                                   end_factor=scheduler_cfg.end_f,
+                                                                   total_iters=scheduler_cfg.total_iters,
+                                                                   )
+                }
+            )
+        elif scheduler_cfg.type == "plateau":
+            scheduler = (
+                {
+                    "scheduler": torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
+                                                                            mode=scheduler_cfg.mode,
+                                                                            factor=scheduler_cfg.factor,
+                                                                            patience=scheduler_cfg.patience,
+                                                                            cooldown=scheduler_cfg.cooldown,
+                                                                            min_lr=scheduler_cfg.min_lr),
+                    "monitor": scheduler_cfg.monitor
+                }
+            )
+        elif scheduler_cfg.type == "noam":
+            scheduler = (
+               {
+                    "scheduler": NoamLR(optimizer=optimizer, warmup_steps=scheduler_cfg.warmup),
+                    "interval": "step",  # runs per batch rather than per epoch
+                    "frequency": 1,
+                }
+            )
+        elif scheduler_cfg.type == "cosine":
+            scheduler = (
+                {
+                    "scheduler": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer=optimizer,
+                                                                                      T_0=scheduler_cfg.cosine_t0),
+                    "interval": "step",  # runs per batch rather than per epoch
+                    "frequency": 1,
+                }
+            )
+        else:
+            logger.exception(f"Invalid option for scheduler: {scheduler_cfg.type} - supported scheduler: none, noam, cosine")
+            raise ValueError(f"Invalid option for scheduler: {scheduler_cfg.type} - supported scheduler: none, noam, cosine")
+
+        logger.success('Done: configure optimizer and lr_scheduler.')
+        return [optimizer], [scheduler]'''
+
+
+    def training_step(self, batch, batch_idx):
+        inputs, labels = batch
+        outputs = self.forward(inputs)
+        loss = self.get_loss(outputs, labels)
+        return loss
+    
+    def validation_step(self, batch, batch_idx):
+        inputs, labels = batch
+        outputs = self.forward(inputs)
+        loss = self.get_loss(outputs, labels)
+        return loss
+
+    def get_loss(self, y_hat, y):
+        loss = torch.nn.functional.mse_loss(y_hat, y)#self.loss_func(y_hat, y)
+        return loss
+        
+    # -------------------------------------------------------------------------------
+
+    def save_model(self, model_name, save_dir):
+        """
+        Save a PyTorch model to a given directory.
+
+        Args:
+            model (torch.nn.Module): The PyTorch model to save.
+            save_dir (str): The directory to save the model to.
+        """
+        # Create the save directory if it doesn't already exist
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+
+        # Save the model to the directory
+        model_path = os.path.join(save_dir, f'{model_name}_epoch={self.current_epoch}_step={self.global_step}.pth')
+        torch.save(self.state_dict(), model_path)
+
+        logger.info(f'Model saved to {model_path}')
+
+if __name__ == "__main__":
+    model = ConvUNet(image_channels=1, output_channels=1)
+    model.test_model(torch.rand(8, 1, 256, 256))
+    summary(model, (1, 256, 256), batch_size=8)

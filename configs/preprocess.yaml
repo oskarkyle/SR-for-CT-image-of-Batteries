@@ -1,4 +1,4 @@
 convert_dtype: null
 
 binning:
-  binning_factor: value
+  binning_factor: 8
