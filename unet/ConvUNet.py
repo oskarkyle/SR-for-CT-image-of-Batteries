@@ -55,9 +55,9 @@ class ConvUNet(L.LightningModule):
                  verbose: bool = True,
                  lr: float = 1e-3,
                  optimizer_type: str = "adam",
-                 maximize: bool = False,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
+                 maximize: bool = False
+                 ):
+        super(ConvUNet, self).__init__()
         self.verbose = verbose
         # hyperparameter:
         self.c_factor = c_factor
@@ -193,13 +193,13 @@ class ConvUNet(L.LightningModule):
         momentum = 0.9#optim_cfg.get("momentum", 0.9)
         # https://gist.github.com/gautierdag/925760d4295080c1860259dba43e4c01
         if self.optimizer_type == "adam":
-            optimizer = torch.optim.Adam(self.model.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, eps=eps)
+            optimizer = torch.optim.Adam(self.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, eps=eps)
         elif self.optimizer_type == "adamw":
-            optimizer = torch.optim.AdamW(self.model.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
+            optimizer = torch.optim.AdamW(self.parameters(), maximize=self.maximize, lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
         elif self.optimizer_type == "sgd":
-            optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate, momentum=momentum)
+            optimizer = torch.optim.SGD(self.parameters(), lr=self.learning_rate, momentum=momentum)
         elif self.optimizer_type == "nadam":
-            optimizer = torch.optim.NAdam(self.model.parameters(), lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
+            optimizer = torch.optim.NAdam(self.parameters(), lr=self.learning_rate, betas=betas, weight_decay=weight_decay, eps=eps)
         else:
             logger.exception(f"illegal optimizer: {self.optimizer_type} - suppported optimizer: adam, adamw, sgd, nadam")
             raise ValueError(f"illegal optimizer: {self.optimizer_type} - suppported optimizer: adam, adamw, sgd, nadam")
@@ -298,5 +298,10 @@ class ConvUNet(L.LightningModule):
 
 if __name__ == "__main__":
     model = ConvUNet(image_channels=1, output_channels=1)
-    model.test_model(torch.rand(8, 1, 256, 256))
-    summary(model, (1, 256, 256), batch_size=8)
+    #model.test_model(torch.rand(8, 1, 512, 512))
+    #summary(model, (1, 256, 256), batch_size=8)
+
+    x = torch.rand(8, 1, 512, 512)
+    train_dataloader = torch.utils.data.DataLoader(x, batch_size=1)
+    trainer = L.Trainer(max_epochs=5)
+    trainer.fit(model, train_dataloader)
