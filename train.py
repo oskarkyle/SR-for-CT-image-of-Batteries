@@ -52,11 +52,11 @@ if __name__ == '__main__':
 
     model = ConvUNet(image_channels=1, output_channels=1)
 
-    logger = TensorBoardLogger('logs', name='ConvUNet')
+    #logger = TensorBoardLogger('logs', name='ConvUNet')
 
-    trainer = L.Trainer(max_epochs=1, 
-                        logger=logger)
+    trainer = L.Trainer(max_epochs=1)#,
+                        #logger=logger)
                         #callbacks=[PlotLossesCallback()])
     
     trainer.fit(model, train_dataloader, test_dataloader)
-    train_loss_values = np.array(trainer.logger.experiment['train_loss'])
+    #train_loss_values = np.array(trainer.logger.experiment['train_loss'])
