@@ -264,12 +264,16 @@ class ConvUNet(L.LightningModule):
         inputs, labels = batch
         outputs = self.forward(inputs)
         loss = self.get_loss(outputs, labels)
+
+        self.log('train_loss', loss)
         return loss
     
     def validation_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.forward(inputs)
         loss = self.get_loss(outputs, labels)
+
+        self.log('val_loss', loss)
         return loss
     
     def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0):

@@ -1,6 +1,7 @@
 import argparse
 import os
 import copy
+import numpy as np
 
 import torch
 from torch import nn, tensor
@@ -47,9 +48,9 @@ if __name__ == '__main__':
     dataset = prepare_data.prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, args.size)
     train_dataloader, test_dataloader = prepare_data.prepare_dataloader(dataset, args.batch_size)
 
-    prepare_data.check_dataset(dataset)
+    #prepare_data.check_dataset(dataset)
 
-    '''model = ConvUNet(image_channels=1, output_channels=1)
+    model = ConvUNet(image_channels=1, output_channels=1)
 
     logger = TensorBoardLogger('logs', name='ConvUNet')
 
@@ -57,4 +58,5 @@ if __name__ == '__main__':
                         logger=logger)
                         #callbacks=[PlotLossesCallback()])
     
-    trainer.fit(model, train_dataloader, test_dataloader)'''
+    trainer.fit(model, train_dataloader, test_dataloader)
+    train_loss_values = np.array(trainer.logger.experiment['train_loss'])
