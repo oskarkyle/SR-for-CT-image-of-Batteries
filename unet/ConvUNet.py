@@ -1,4 +1,4 @@
-from typing import Tuple, Union, List, Sequence
+from typing import Any, Tuple, Union, List, Sequence
 from loguru import logger
 from omegaconf import DictConfig
 import pytorch_lightning as L
@@ -271,6 +271,11 @@ class ConvUNet(L.LightningModule):
         outputs = self.forward(inputs)
         loss = self.get_loss(outputs, labels)
         return loss
+    
+    def predict_step(self, batch: Any, batch_idx: int, dataloader_idx: int = 0):
+        x, y = batch
+        predictions = self.forward(x)
+        return predictions
 
     def get_loss(self, y_hat, y):
         loss = torch.nn.functional.mse_loss(y_hat, y)#self.loss_func(y_hat, y)

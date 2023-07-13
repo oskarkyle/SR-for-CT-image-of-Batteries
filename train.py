@@ -3,12 +3,14 @@ import os
 import copy
 
 import torch
-from torch import nn
+from torch import nn, tensor
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from tqdm import tqdm
 import pytorch_lightning as L
+from pytorch_lightning.loggers import TensorBoardLogger
+#from pytorch_lightning.callbacks import PlotLossesCallback
 
 from unet.ConvUNet import ConvUNet
 from data_utils import prepare_data
@@ -45,6 +47,14 @@ if __name__ == '__main__':
     dataset = prepare_data.prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, args.size)
     train_dataloader, test_dataloader = prepare_data.prepare_dataloader(dataset, args.batch_size)
 
-    model = ConvUNet(image_channels=1, output_channels=1)
-    trainer = L.Trainer(max_epochs=5)
-    trainer.fit(model, train_dataloader, test_dataloader)
+    prepare_data.check_dataset(dataset)
+
+    '''model = ConvUNet(image_channels=1, output_channels=1)
+
+    logger = TensorBoardLogger('logs', name='ConvUNet')
+
+    trainer = L.Trainer(max_epochs=1, 
+                        logger=logger)
+                        #callbacks=[PlotLossesCallback()])
+    
+    trainer.fit(model, train_dataloader, test_dataloader)'''
