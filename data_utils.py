@@ -90,7 +90,7 @@ class prepare_data:
             input, label = dataset.__getitem__(i)
 
             print(i, input.shape, label.shape)
-            '''input = input.squeeze(0).numpy()
+            input = input.squeeze(0).numpy()
             label = label.squeeze(0).numpy()
 
             fig, axes = plt.subplots(1, 2)
@@ -104,6 +104,6 @@ class prepare_data:
             plt.show(block=False)
             plt.pause(0.5)
             plt.close()
-            time.sleep(0.5)'''           
+            time.sleep(0.5)           
 
             

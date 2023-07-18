@@ -21,7 +21,7 @@ parser.add_argument('-m', '--model', dest='model', type=str, default='SRCNN')
 parser.add_argument('-s', '--size', dest='size', type = int, help='The size of each tile in pages in tiff', default=512)
 parser.add_argument('-lr', '--lr', dest='lr', type=float, default=1e-4)
 parser.add_argument('-ep', '--num_epochs', dest='num_epochs', type=int, default=100)
-parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=32)
+parser.add_argument('-b', '--batch_size', dest='batch_size', type=int, default=4)
 parser.add_argument('-bi', '--bilinear', action='store_true', default=False, help='Use bilinear upsampling')
 args = parser.parse_args()
 

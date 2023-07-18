@@ -305,6 +305,37 @@ class ConvUNet(L.LightningModule):
 
         logger.info(f'Model saved to {model_path}')
 
+    @classmethod
+    def restore(cls: L.LightningModule, ckpt: str, map_location: Union[torch.device, str, int] = "cpu"):
+        """
+        Restores a PyTorch Lightning model from a checkpoint file.
+
+        Args:
+            cls (LightningModule): The class of the PyTorch Lightning model to restore.
+            ckpt (str): The path to the checkpoint file to restore from.
+            map_location (Union[torch.device, str, int]): Device to map the restored model to.
+
+        Returns:
+            Tuple[LightningModule, DictConfig]: A tuple of the restored model and its configuration.
+
+        Raises:
+            RuntimeError: If the checkpoint file does not contain hyperparameters.
+
+        Example:
+            # Restore a PLModel from a checkpoint file
+            model, config = PLModel.restore(ckpt='path/to/checkpoint.ckpt')
+        """
+        torch_ckpt = torch.load(ckpt)
+        if "hyper_parameters" not in torch_ckpt:
+            logger.error("Checkpoint does not contain hyperparameters.")
+            raise RuntimeError("Checkpoint does not contain hyperparameters.")
+
+        logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls.__name__}\n\tcheckpoint: {ckpt}")
+        model = cls.load_from_checkpoint(checkpoint_path=ckpt, map_location=map_location)
+        logger.success(f"Successfully loaded checkpoint")
+
+        return model#, OmegaConf.create(torch_ckpt["hyper_parameters"])
+
 if __name__ == "__main__":
     model = ConvUNet(image_channels=1, output_channels=1)
     #model.test_model(torch.rand(8, 1, 512, 512))
