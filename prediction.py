@@ -4,6 +4,9 @@ from torch.utils.data import DataLoader
 import pytorch_lightning as L
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from loguru import logger
+import matplotlib.pyplot as plt
+import time
+from torchvision import transforms
 
 from BaseDataset import BaseDataset
 from data_utils import prepare_data
@@ -14,12 +17,8 @@ def load_data(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, size, bat
     pred_dataloader = DataLoader(pred_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
     return pred_dataset, pred_dataloader
 
-def predict(model, ckpt_path):
-    model = ConvUNet.restore(model, ckpt_path)
-   
-    return model
 
-def restore(cls: L.LightningModule, ckpt: str, map_location = torch.device("cpu")):
+def restore(cls: L.LightningModule, ckpt: str):#, map_location = torch.device("cpu")):
         """
         Restores a PyTorch Lightning model from a checkpoint file.
 
@@ -44,11 +43,29 @@ def restore(cls: L.LightningModule, ckpt: str, map_location = torch.device("cpu"
             raise RuntimeError("Checkpoint does not contain hyperparameters.")
 
         logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls.__name__}\n\tcheckpoint: {ckpt}")
-        model = cls.load_from_checkpoint(checkpoint_path=ckpt, map_location=map_location)
+        model = cls.load_from_checkpoint(checkpoint_path=ckpt)#, map_location=map_location)
         logger.success(f"Successfully loaded checkpoint")
 
         return model#, OmegaConf.create(torch_ckpt["hyper_parameters"])
 
+def prediction(model, dataloader):
+
+    for batch in dataloader:
+        inputs, labels = batch
+        outputs = model(inputs)
+        print(outputs.shape)
+
+        lenght = outputs.shape[0]
+        for i in range(lenght):
+            output = outputs[i, :, :, :]
+            output = output.squeeze(0)
+            output = output.detach().numpy()
+            plt.imshow(output, cmap='gray')
+            plt.show()
+            
+             
+            
+            
 
 if __name__ == "__main__":
 
@@ -67,4 +84,10 @@ if __name__ == "__main__":
     ckpt_path = "/Users/haoruilong/BA_code/version_1/checkpoints/epoch=0-step=9280.ckpt"
 
     model = ConvUNet(image_channels=1, output_channels=1)
-    trained_model = restore(model, ckpt_path)
+    checkpoint = torch.load(ckpt_path, map_location=torch.device('cpu'))
+
+    model_state_dict = checkpoint['state_dict']
+    trained = model.load_state_dict(model_state_dict)
+    
+    prediction(model, pred_dataloader)
+
