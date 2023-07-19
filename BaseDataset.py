@@ -251,7 +251,6 @@ class BaseDataset(DS):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        label = None
         # Load Image
         raw_data = self.get_tile_from_index(idx)
         raw_data = raw_data.unsqueeze(dim=0)
@@ -262,7 +261,7 @@ class BaseDataset(DS):
         raw_data_float = torch.tensor(raw_data.clone().detach(), dtype=torch.float32)
         """
         data = raw_data
-        
+        label = raw_data
         
         """
             UNCHANGED = 0
@@ -307,7 +306,7 @@ class BaseDataset(DS):
             # return {"data_path": data_path}, data.float()
             return data.float()
         """
-        return data.float(), raw_data.float()
+        return data.float(), label.float()
 
 """
 if __name__ == "__main__":

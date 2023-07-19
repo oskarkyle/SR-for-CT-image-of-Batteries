@@ -9,8 +9,8 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from tqdm import tqdm
-import pytorch_lightning as L
-from pytorch_lightning.loggers import TensorBoardLogger
+import lightning as L
+#from lightning.loggers import TensorBoardLogger
 #from pytorch_lightning.callbacks import PlotLossesCallback
 
 from unet.ConvUNet import ConvUNet
@@ -27,12 +27,12 @@ args = parser.parse_args()
 
 # Prepare dataloader for training and testing
 # Data path
-data_root = f'H:\SR_for_CT_image_of_Batteries'
-dataset_dir = [f'\dataset\pristine']
+data_root = f'/home/tte/PycharmProjects/students/haorui/SR_for_CT_image_of_Batteries'
+dataset_dir = [f'/data/Pristine']
 
 # Prepare configurations for dataset
-cfgs_path_p = data_root + '\configs\preprocess.yaml'
-cfgs_path_t = data_root + '\configs\transform.yaml'
+cfgs_path_p = data_root + '/configs/preprocess.yaml'
+cfgs_path_t = data_root + '/configs/transform.yaml'
 
 if os.path.exists(cfgs_path_p):
     preprocess_cfgs = OmegaConf.load(cfgs_path_p)

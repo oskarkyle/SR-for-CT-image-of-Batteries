@@ -1,14 +1,14 @@
 from typing import Any, Tuple, Union, List, Sequence
 from loguru import logger
 from omegaconf import DictConfig
-import pytorch_lightning as L
+import lightning as L
 from timm.scheduler.scheduler import Scheduler
 from torch.optim import Optimizer
 
 import os
 import torch
 from torch import nn
-from torchsummary import summary
+#from torchsummary import summary
 #from src.model.base.BaseModel import PLModel
 
 from unet.blocks import Swish, ConvBlock, SkipConnection, CombineConnection
@@ -43,8 +43,8 @@ class ConvUNet(L.LightningModule):
     """
     def __init__(self,
                  #model_cfg: DictConfig,
-                 image_channels: int,
-                 output_channels: int,
+                 image_channels: int = 1,
+                 output_channels: int = 1,
                  c_factor: int = 6,  # = 2^6 = 64 dim der TimeEmbeddings
                  ch_mults: Union[Tuple[int, ...], List[int]] = (1, 2, 3, 4),
                  n_blocks: int = 2,
