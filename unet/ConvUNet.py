@@ -327,14 +327,17 @@ class ConvUNet(L.LightningModule):
             # Restore a PLModel from a checkpoint file
             model, config = PLModel.restore(ckpt='path/to/checkpoint.ckpt')
         """
+        """
         torch_ckpt = torch.load(ckpt)
         if "hyper_parameters" not in torch_ckpt:
             logger.error("Checkpoint does not contain hyperparameters.")
             raise RuntimeError("Checkpoint does not contain hyperparameters.")
+            """
 
-        logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls.__name__}\n\tcheckpoint: {ckpt}")
+        logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls._get_name}\n\tcheckpoint: {ckpt}")
         model = cls.load_from_checkpoint(checkpoint_path=ckpt, map_location=map_location)
         logger.success(f"Successfully loaded checkpoint")
+        
 
         return model#, OmegaConf.create(torch_ckpt["hyper_parameters"])
 

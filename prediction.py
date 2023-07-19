@@ -38,12 +38,12 @@ def restore(cls: L.LightningModule, ckpt: str, map_location: Union[torch.device,
             # Restore a PLModel from a checkpoint file
             model, config = PLModel.restore(ckpt='path/to/checkpoint.ckpt')
         """
-        """
+        
         torch_ckpt = torch.load(ckpt, map_location=map_location)
         if "hyper_parameters" not in torch_ckpt:
             logger.error("Checkpoint does not contain hyperparameters.")
             raise RuntimeError("Checkpoint does not contain hyperparameters.")
-        """
+        
         logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls._get_name()}\n\tcheckpoint: {ckpt}")
         model = cls.load_from_checkpoint(checkpoint_path=ckpt, map_location=map_location, image_channels=1, output_channels=1)
         logger.success(f"Successfully loaded checkpoint")
@@ -55,12 +55,26 @@ def prediction(model: L.LightningModule, dataloader):
     predictions = trainer.predict(model, dataloader)
     return predictions
 
-def plot_pred(predictions):
+def plot_img(predictions, pred_dataloader):
+    pred = []
     for i, batch in enumerate(predictions):
         for j, img in enumerate(batch):
-            img = img.squeeze(0)
             print(img.shape)
-            plt.imshow(img, cmap='gray')
+            img = img.squeeze().numpy()
+            pred.append(img)
+
+    input, label = prepare_data.check_dataloader(pred_dataloader)
+
+    if len(pred) == len(input):
+        for i in range(len(pred)):
+            fig, ax = plt.subplots(1, 3)
+            ax[0].imshow(input[i], cmap='gray')
+            ax[0].set_title('Input')
+            ax[1].imshow(pred[i], cmap='gray')
+            ax[1].set_title('Prediction')
+            ax[2].imshow(label[i], cmap='gray')
+            ax[2].set_title('Label')
+            plt.tight_layout()
             plt.show()
 
 if __name__ == "__main__":
@@ -83,5 +97,6 @@ if __name__ == "__main__":
     model = restore(model, ckpt_path)
     #model = model.load_from_checkpoint(ckpt_path, map_location='cpu', image_channels=1, output_channels=1)
     predictions = prediction(model, pred_dataloader)
-    prepare_data.check_dataset(pred_dataset)
-    plot_pred(predictions)
+    #prepare_data.check_dataset(pred_dataset)
+    #prepare_data.check_dataloader(pred_dataloader)
+    plot_img(predictions, pred_dataloader)

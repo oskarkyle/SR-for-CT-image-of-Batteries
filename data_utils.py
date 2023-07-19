@@ -4,6 +4,7 @@ import torch
 import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 import time
+from torchvision import transforms
 
 import matplotlib.pyplot as plt
 
@@ -60,7 +61,7 @@ class prepare_data:
         return subset
     
     @staticmethod
-    def plotimgs(imgs: list, titles: list, cmap: str = None, figsize: tuple = (20, 20)):
+    def plotimgs(input: list, pred: list, label:list, cmap: str = None, figsize: tuple = (20, 20)):
         """ Plot images
         Args:
             imgs: list of images
@@ -71,14 +72,29 @@ class prepare_data:
             None
         """
         
-        num_imgs = len(imgs)
-        fig, axes = plt.subplots(1, num_imgs, figsize=figsize)
-        for i in range(num_imgs):
-            imgs[i] = imgs[i].squeeze(0).numpy()
-            axes[i].imshow(imgs[i], cmap=cmap)
-            axes[i].set_title(titles[i])
+        num_imgs_pred = len(pred)
+        num_imgs_input = len(input)
+
+        if num_imgs_pred == num_imgs_input:
+            fig, axes = plt.subplots(1, 3, figsize=figsize)
+            for i in range(num_imgs_input):
+                axes[0].imshow(input[i], cmap=cmap)
+                axes[0].set_title('input')
+
+                axes[1].imshow(pred[i], cmap=cmap)
+                axes[1].set_title('prediction')
+
+                axes[2].imshow(label[i], cmap=cmap)
+                axes[2].set_title('label')
+
+                plt.tight_layout()
+                plt.show(block=False)
+                plt.pause(0.5)
+                plt.close()
+                time.sleep(0.5)
+            
         
-        plt.show()
+        
 
     @staticmethod
     def check_dataset(dataset):
@@ -106,4 +122,19 @@ class prepare_data:
             plt.close()
             time.sleep(0.5)           
 
-            
+    def check_dataloader(dataloader):
+        input = []
+        label = []
+
+        for data in dataloader:
+            inputs, labels = data
+            for img in inputs:
+                img = transforms.ToPILImage()(img)
+                input.append(img)
+
+            for img in labels:
+                img = transforms.ToPILImage()(img)
+                label.append(img)
+
+        return input, label
+
