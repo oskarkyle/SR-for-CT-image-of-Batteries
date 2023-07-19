@@ -73,6 +73,8 @@ class ConvUNet(L.LightningModule):
         self.learning_rate = lr
         self.optimizer_type = optimizer_type
         self.maximize = maximize
+        self.image_channels = image_channels
+        self.output_channels = output_channels
 
 
         if verbose:
@@ -86,7 +88,7 @@ class ConvUNet(L.LightningModule):
 
         n_channels = 2 ** self.c_factor
         n_resolutions = len(self.ch_mults)
-        self.image_proj = nn.Conv2d(image_channels, n_channels, kernel_size=(3, 3), padding=(1, 1))
+        self.image_proj = nn.Conv2d(image_channels, n_channels, kernel_size=(3, 3), padding=(1, 1)) # Change
 
         in_channels = n_channels
 
@@ -122,7 +124,7 @@ class ConvUNet(L.LightningModule):
 
         self.norm = nn.GroupNorm(8, n_channels)
         self.act = Swish()
-        self.final = nn.Conv2d(in_channels, output_channels, kernel_size=(3, 3), padding=(1, 1))
+        self.final = nn.Conv2d(in_channels, output_channels, kernel_size=(3, 3), padding=(1, 1)) # Change
 
         self.sig = nn.Sigmoid()
 
