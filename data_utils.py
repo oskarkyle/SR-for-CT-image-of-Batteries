@@ -1,4 +1,6 @@
 import imp
+import multiprocessing
+
 from numpy import block
 import torch
 import torch.utils.data as data_utils
@@ -25,7 +27,7 @@ class prepare_data:
         dataset = BaseDataset('SR', 'train', size, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
         return dataset
     @staticmethod
-    def prepare_dataloader(dataset, batch_size, split_factor=0.8, shuffle=True, num_workers=4):
+    def prepare_dataloader(dataset, batch_size, split_factor=0.8, shuffle=True, num_workers=None):
         """ Prepare dataloader for training and testing
         Args:
             dataset: dataset object
@@ -36,6 +38,9 @@ class prepare_data:
         Returns:
             train and test dataloader
         """
+        if num_workers is None:
+            num_workers = multiprocessing.cpu_count()
+
         length_dataset = dataset.__len__()
         train_size = int(split_factor * length_dataset)
         test_size = length_dataset - train_size
