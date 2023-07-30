@@ -34,6 +34,7 @@ class BaseDataset(DS):
                  task,
                  mode,
                  tile_size, 
+                 tile_grid,
                  dataset_dir: Union[List[str], str],
                  data_root: str = "",
                  transforms_cfg: DictConfig = None,
@@ -68,12 +69,13 @@ class BaseDataset(DS):
         self.data_root = data_root
         self.tile_size = tile_size
         self.file_list = self.load_file_paths_from_dir(data_root, dataset_dir)
+        self.tile_grid = tile_grid
         # self.dataset = self.prepare_data_list(self.file_list)
         self.tiles_count_in_each_tiff = []
         self.tiling_grid_in_each_tiff = []
         self.page_count_in_each_tiff = []
         self.tiff_intersection_border = [0]
-        self.check_dataset_constrains()
+        #self.check_dataset_constrains()
         self.transform_cfg = transforms_cfg
         self.transform = self.get_transforms(transforms_cfg)
         self.preprocess_cfg = preprocess_cfg
@@ -99,7 +101,7 @@ class BaseDataset(DS):
         with tifffile.TiffFile(tiff_file) as handle:
             current_page = handle.pages[0]
                 
-        tiling_grid_info = tiling.get_tiling_grid(current_page, tile_size)
+        tiling_grid_info = [self.tile_grid, self.tile_grid]#tiling.get_tiling_grid(current_page, tile_size)
         tiles_count_in_current_page = tiling_grid_info[0] * tiling_grid_info[1]
         tiles_count_in_each_tiff = pages_count_in_tiff * tiles_count_in_current_page
         
@@ -111,7 +113,7 @@ class BaseDataset(DS):
         with tifffile.TiffFile(tiff_file) as handle:
             current_page = handle.pages[0]
                 
-        tiling_grid_info = tiling.get_tiling_grid(current_page, tile_size)  
+        tiling_grid_info = [self.tile_grid, self.tile_grid]#tiling.get_tiling_grid(current_page, tile_size)  
         return tiling_grid_info   
 
     def get_item_position(self, idx):
@@ -141,19 +143,24 @@ class BaseDataset(DS):
         print("sequence number of tile in page:", sequence_number_of_tile_in_page)
         print("tiff_file index:", tifffile_index)
         """
-        return tifffile_index,page_index,sequence_number_of_tile_in_page
+        logger.info(f"tiff_file index: {tifffile_index}, sequence number of tile in page: {sequence_number_of_tile_in_page}, page index: {page_index}, tile_grid: {tiling_grid_info}")
+        
+        return tifffile_index,page_index,sequence_number_of_tile_in_page,tiling_grid_info
 
 
     
     def get_tile_from_index(self, index):
-        tifffile_index,page_index,sequence_number_of_tile_in_page = self.get_item_position(index)
+        tifffile_index,page_index,sequence_number_of_tile_in_page,tiling_grid_info = self.get_item_position(index)
+
         tiff_file = self.file_list[tifffile_index]
+        
+
         with tifffile.TiffFile(tiff_file) as handle:
             current_page = handle.pages[page_index]
             page_array = current_page.asarray()
             page_tensor = torch.from_numpy(page_array)
             tile_size = self.tile_size
-            tile = tiling.get_tile_by_sequence_number(page_tensor, tile_size, sequence_number_of_tile_in_page)
+            tile = tiling.get_tile_by_sequence_number(page_tensor, sequence_number_of_tile_in_page, tiling_grid_info)
             if tile.shape != (tile_size, tile_size):
                 tile = tiling.pad(tile, tile_size)
 
@@ -254,12 +261,7 @@ class BaseDataset(DS):
         # Load Image
         raw_data = self.get_tile_from_index(idx)
         raw_data = raw_data.unsqueeze(dim=0)
-        """
-        print("Number of dimensions:", raw_data.dim())
-        print("Size of each dimension:", raw_data.size())
-
-        raw_data_float = torch.tensor(raw_data.clone().detach(), dtype=torch.float32)
-        """
+        
         data = raw_data
         label = raw_data
         
@@ -298,15 +300,9 @@ class BaseDataset(DS):
         plt.show()
         """
     
-        """
-        if label is not None:
-            # return {"data_path": data_path, "label_path": label_path}, data.float(), label.float()
-            return data.float(), label.float()
-        else:
-            # return {"data_path": data_path}, data.float()
-            return data.float()
-        """
         return data.float(), label.float()
+
+
 
 """
 if __name__ == "__main__":
@@ -336,3 +332,41 @@ if __name__ == "__main__":
 
     sample = mydataset.__getitem__(8352)
     """
+if __name__ == "__main__":
+    data_root = '/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries'
+    dataset_dir = ['/dataset/Pristine']
+
+    cfgs_path_p = data_root + '/configs/preprocess.yaml'
+    cfgs_path_t = data_root + '/configs/transform.yaml'
+
+    if os.path.exists(cfgs_path_p):
+        preprocess_cfgs = OmegaConf.load(cfgs_path_p)
+    else:
+        preprocess_cfgs = None
+
+    if os.path.exists(cfgs_path_t):
+        transform_cfgs = OmegaConf.load(cfgs_path_t)
+    else:
+        preprocess_cfgs = None
+
+    filelist = BaseDataset.load_file_paths_from_dir(data_root, dataset_dir)
+    print(filelist)
+
+    mydataset = BaseDataset('SR', 'train', 512, 4, dataset_dir, data_root, None, preprocess_cfgs)
+    
+    
+    length_dataset = mydataset.__len__()
+    print(length_dataset)
+    for i in range(16):
+        data, label = mydataset.__getitem__(i)
+        data = data.squeeze().numpy()
+        label = label.squeeze().numpy()
+
+        fig, ax = plt.subplots(1,2)
+        ax[0].imshow(data, cmap='gray')
+        ax[0].set_title('input')
+        ax[1].imshow(label, cmap='gray')
+        ax[1].set_title('label')
+
+        plt.tight_layout()
+        plt.show()

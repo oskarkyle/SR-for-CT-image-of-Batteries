@@ -49,8 +49,8 @@ class Tile():
 # Receives a numpy array and returns a list of Tile objects
 # Todo: Optimization for native numpy return value
 
-def get_tiling_grid(image,tile_size):
-     height, width = image.shape[:2]
+def get_tiling_grid(tile_grid):#image,tile_grid):
+     '''height, width = image.shape[:2]
   
      tiles_count_vertical = height // tile_size
      h_rest = height % tile_size
@@ -63,7 +63,9 @@ def get_tiling_grid(image,tile_size):
      if(w_rest != 0):
         tiles_count_horizontal += 1
 
-     return [tiles_count_vertical,tiles_count_horizontal]
+     return [tiles_count_vertical,tiles_count_horizontal]'''
+
+     return [tile_grid,tile_grid]
 
 def pad(tile,tile_size):
     img = tile
@@ -111,25 +113,30 @@ def split(image, tile_size,pic_identifier):
     return tiles
 
 # Fetch and return a tile on its sequence number in original pic 
-def get_tile_by_sequence_number(image,tile_size,sequence_number):
+def get_tile_by_sequence_number(image,sequence_number,tile_grid: list): #tile_size,
      height, width = image.shape[:2]
-     h_tiles,w_tiles = get_tiling_grid(image,tile_size)
+     #h_tiles,w_tiles = get_tiling_grid(tile_grid
+     h_tiles = tile_grid[0]
+     w_tiles = tile_grid[1]
+
+     vertical_size = height // h_tiles
+     horizontal_size = width // w_tiles
      # print("tiles:",h_tiles,w_tiles)
      position_h = sequence_number // h_tiles
      position_w = sequence_number % w_tiles
      
      if(position_h < h_tiles - 1 and position_w < w_tiles - 1):
         # print("here")
-        raw_tile = image[position_h*tile_size:(position_h + 1)*tile_size, position_w*tile_size:(position_w+1)*tile_size]
+        raw_tile = image[position_h*vertical_size:(position_h + 1)*vertical_size, position_w*horizontal_size:(position_w+1)*horizontal_size]
         return raw_tile
      elif(position_h == h_tiles - 1 and position_w < w_tiles -1):
-        raw_tile = image[position_h*tile_size:height, position_w*tile_size:(position_w+1)*tile_size]
+        raw_tile = image[position_h*vertical_size:height, position_w*horizontal_size:(position_w+1)*horizontal_size]
         return raw_tile
      elif(position_h < h_tiles - 1 and position_w == w_tiles -1):
-        raw_tile = image[position_h*tile_size:(position_h+1)*tile_size, position_w*tile_size:width]
+        raw_tile = image[position_h*vertical_size:(position_h+1)*vertical_size, position_w*horizontal_size:width]
         return raw_tile
      elif(position_h == h_tiles - 1 and position_w == w_tiles -1):
-        raw_tile = image[position_h*tile_size:height, position_w*tile_size:width]
+        raw_tile = image[position_h*vertical_size:height, position_w*horizontal_size:width]
         return raw_tile
      else:
          print("position_h: {}, position_w: {}".format(position_h,position_w))
