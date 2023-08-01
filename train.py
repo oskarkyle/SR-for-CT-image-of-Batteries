@@ -15,7 +15,7 @@ from lightning.pytorch.callbacks import LearningRateMonitor
 
 import matplotlib.pyplot as plt
 
-from unet.ConvUNet import ConvUNet
+from unet.ConvUNet import *
 from data_utils import prepare_data
 
 parser = argparse.ArgumentParser()
@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     #prepare_data.check_dataset(dataset)
 
-    model = ConvUNet(image_channels=1, output_channels=1)
+    model = ConvUNet()
 
     trainer = L.Trainer(max_epochs=1, callbacks=[LearningRateMonitor(logging_interval='epoch'), TrainLossPlotter('output')])
     
