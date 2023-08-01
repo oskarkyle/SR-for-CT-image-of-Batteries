@@ -37,7 +37,9 @@ def plot_img(predictions, pred_dataloader):
 
     if len(pred) == len(input):
         for i in range(len(pred)):
-            fig, ax = plt.subplots(1, 3)
+            
+            fig, ax = plt.subplots(1, 3, figsize=(10, 10))
+
             ax[0].imshow(input[i], cmap='gray')
             ax[0].set_title('Input')
             ax[1].imshow(pred[i], cmap='gray')
@@ -65,7 +67,7 @@ if __name__ == "__main__":
         transform_cfgs = None
 
     batch_size = 4
-    subset_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    subset_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
 
     dataset = prepare_data.prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, 512, 4)
     pred_dataset = prepare_data.prepare_pred_dataset(dataset, subset_indices)
