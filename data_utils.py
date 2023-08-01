@@ -14,7 +14,7 @@ from BaseDataset import BaseDataset
 
 class prepare_data:
     @staticmethod
-    def prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, size):
+    def prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, size, tile_grid):
         """ Prepare dataset for training and testing
         Args:
             data_root: root path of dataset
@@ -24,7 +24,7 @@ class prepare_data:
         Returns:
             dataset object
         """
-        dataset = BaseDataset('SR', 'train', size, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
+        dataset = BaseDataset('SR', 'train', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
         return dataset
     @staticmethod
     def prepare_dataloader(dataset, batch_size, split_factor=0.8, shuffle=True, num_workers=None):
@@ -53,7 +53,7 @@ class prepare_data:
         return train_dataloader, test_dataloader
     
     @staticmethod
-    def prepare_pred_dataset(data_root, dataset_dir, size, transform_cfgs=None, preprocess_cfgs=None, subset_indices: list = None):
+    def prepare_pred_dataset(data_root, dataset_dir, size, tile_grid, transform_cfgs=None, preprocess_cfgs=None, subset_indices: list = None):
         """ Prepare dataset for prediction
         Args:
             data_root: root path of dataset
@@ -61,7 +61,7 @@ class prepare_data:
         Returns:
             dataset object
         """
-        dataset = BaseDataset('SR', 'pred', size, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
+        dataset = BaseDataset('SR', 'pred', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
         subset = torch.utils.data.Subset(dataset, subset_indices)
         return subset
     

@@ -70,7 +70,7 @@ class BaseDataset(DS):
         self.tile_size = tile_size
         self.file_list = self.load_file_paths_from_dir(data_root, dataset_dir)
         self.tile_grid = tile_grid
-        # self.dataset = self.prepare_data_list(self.file_list)
+        #self.dataset = self.prepare_data_list(self.file_list)
         self.tiles_count_in_each_tiff = []
         self.tiling_grid_in_each_tiff = []
         self.page_count_in_each_tiff = []
@@ -136,14 +136,8 @@ class BaseDataset(DS):
         # Postion in grid to locate a tile in current page
         tiling_grid_info = self.tiling_grid_in_each_tiff[tifffile_index]
         sequence_number_of_tile_in_page = tile_offset_in_current_tifffile - tiling_grid_info[0] * tiling_grid_info[1] * page_index
-        """
-        print("tile_offset_in_current_tifffile:", tile_offset_in_current_tifffile)
-        print("page index:", page_index)
-        print("tiling grid:", tiling_grid_info)
-        print("sequence number of tile in page:", sequence_number_of_tile_in_page)
-        print("tiff_file index:", tifffile_index)
-        """
-        logger.info(f"tiff_file index: {tifffile_index}, sequence number of tile in page: {sequence_number_of_tile_in_page}, page index: {page_index}, tile_grid: {tiling_grid_info}")
+
+        #logger.info(f"tiff_file index: {tifffile_index}, sequence number of tile in page: {sequence_number_of_tile_in_page}, page index: {page_index}, tile_grid: {tiling_grid_info}")
         
         return tifffile_index,page_index,sequence_number_of_tile_in_page,tiling_grid_info
 
@@ -280,64 +274,17 @@ class BaseDataset(DS):
         # Transform
         if self.transform:
             data, label = self.transform(data, label)
- 
-        """
-        original = raw_data.squeeze().numpy()
-        binning = data.squeeze().numpy()
 
-        # Create a figure with two subplots
-        fig, axes = plt.subplots(1, 2)
-
-        # Plot the first image tensor
-        axes[0].imshow(original, cmap='gray')
-        axes[0].set_title('original')
-
-        # Plot the second image tensor
-        axes[1].imshow(binning, cmap='gray')
-        axes[1].set_title('preprocess')
-
-        plt.tight_layout()
-        plt.show()
-        """
     
         return data.float(), label.float()
 
 
-
-"""
 if __name__ == "__main__":
-    data_root = '/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries'
-    dataset_dir = ['/Dataset/Pristine']
+    data_root = r'H:\SR_for_CT_image_of_Batteries'
+    dataset_dir = [r'\dataset\pristine']
 
-    cfgs_path_p = data_root + '/configs/preprocess.yaml'
-    cfgs_path_t = data_root + '/configs/transform.yaml'
-
-    if os.path.exists(cfgs_path_p):
-        preprocess_cfgs = OmegaConf.load(cfgs_path_p)
-    else:
-        preprocess_cfgs = None
-
-    if os.path.exists(cfgs_path_t):
-        transform_cfgs = OmegaConf.load(cfgs_path_t)
-    else:
-        preprocess_cfgs = None
-
-    mydataset = BaseDataset('SR', 'train', 256, dataset_dir, data_root, None, preprocess_cfgs)
-    length_dataset = mydataset.__len__()
-    print(length_dataset)
-    mydataloader = DataLoader(mydataset, batch_size=3, shuffle=True)
-
-    for batch in mydataloader:
-        pass
-
-    sample = mydataset.__getitem__(8352)
-    """
-if __name__ == "__main__":
-    data_root = '/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries'
-    dataset_dir = ['/dataset/Pristine']
-
-    cfgs_path_p = data_root + '/configs/preprocess.yaml'
-    cfgs_path_t = data_root + '/configs/transform.yaml'
+    cfgs_path_p = data_root + '\configs\preprocess.yaml'
+    cfgs_path_t = data_root + '\configs\transform.yaml'
 
     if os.path.exists(cfgs_path_p):
         preprocess_cfgs = OmegaConf.load(cfgs_path_p)
