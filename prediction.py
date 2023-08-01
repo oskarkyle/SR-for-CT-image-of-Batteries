@@ -1,4 +1,7 @@
+import os
 import torch
+import torch.nn as nn
+import torch.optim as optim
 import torch.utils.data as data_utils
 from torch.utils.data import DataLoader
 import pytorch_lightning as L
@@ -6,18 +9,16 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 from loguru import logger
 import matplotlib.pyplot as plt
 import time
+
 from torchvision import transforms
 from typing import Any, Tuple, Union, List, Sequence
 
 from BaseDataset import BaseDataset
 from data_utils import prepare_data
-from unet.ConvUNet import ConvUNet
+from unet.ConvUNet import *
 
-def load_data(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, size, batch_size, subset_indices: list = None):
-    pred_dataset = prepare_data.prepare_pred_dataset(data_root, dataset_dir, size, transform_cfgs, preprocess_cfgs, subset_indices)
-    pred_dataloader = DataLoader(pred_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
-    return pred_dataset, pred_dataloader
-
+def is_lightning_module(model):
+    return isinstance(model, L.LightningModule)
 
 def prediction(model: L.LightningModule, dataloader):
     trainer = L.Trainer()
@@ -47,25 +48,39 @@ def plot_img(predictions, pred_dataloader):
             plt.show()
 
 if __name__ == "__main__":
+    data_root = r'H:\SR_for_CT_image_of_Batteries'
+    dataset_dir = [r'\dataset\pristine']
 
-    data_root = f'/home/tte/PycharmProjects/students/haorui/SR_for_CT_image_of_Batteries'
-    dataset_dir = [f'/data/Pristine']
+    cfgs_path_p = data_root + '\configs\preprocess.yaml'
+    cfgs_path_t = data_root + '\configs\transform.yaml'
 
-    cfgs_path_p = data_root + '/configs/preprocess.yaml'
-    preprocess_cfgs = OmegaConf.load(cfgs_path_p)
+    if os.path.exists(cfgs_path_p):
+        preprocess_cfgs = OmegaConf.load(cfgs_path_p)
+    else:
+        preprocess_cfgs = None
+
+    if os.path.exists(cfgs_path_t):
+        transform_cfgs = OmegaConf.load(cfgs_path_t)
+    else:
+        transform_cfgs = None
 
     batch_size = 4
     subset_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 
-    pred_dataset, pred_dataloader = load_data(data_root, dataset_dir, None, preprocess_cfgs, 512, batch_size, subset_indices)
-    
+    dataset = prepare_data.prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, 512, 4)
+    pred_dataset = prepare_data.prepare_pred_dataset(dataset, subset_indices)
+    pred_dataloader = DataLoader(pred_dataset, batch_size=batch_size, shuffle=False)
 
-    ckpt_path = r'./lightning_logs/version_1/checkpoints/epoch=0-step=9280.ckpt'
-    model = ConvUNet(image_channels=1, output_channels=1)
+    # check dataset
+    # prepare_data.check_dataset(pred_dataset)
 
-    #model: L.LightningModule = model.restore(ckpt_path)
-    #model = model.load_from_checkpoint(ckpt_path, map_location='cpu', image_channels=1, output_channels=1)
+    ckpt_path = r'.\lightning_logs\version_5\checkpoints\epoch=0-step=9280.ckpt'
+    print(is_lightning_module(ConvUNet()))
+
+    model: L.LightningModule = ConvUNet().restore(ckpt_path)
+    print(is_lightning_module(model))
+
     predictions = prediction(model, pred_dataloader)
-    #prepare_data.check_dataset(pred_dataset)
-    #prepare_data.check_dataloader(pred_dataloader)
+
     plot_img(predictions, pred_dataloader)
+    

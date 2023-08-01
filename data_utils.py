@@ -53,15 +53,8 @@ class prepare_data:
         return train_dataloader, test_dataloader
     
     @staticmethod
-    def prepare_pred_dataset(data_root, dataset_dir, size, tile_grid, transform_cfgs=None, preprocess_cfgs=None, subset_indices: list = None):
-        """ Prepare dataset for prediction
-        Args:
-            data_root: root path of dataset
-            dataset_dir: directory of dataset
-        Returns:
-            dataset object
-        """
-        dataset = BaseDataset('SR', 'pred', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
+    def prepare_pred_dataset(dataset, subset_indices: list = None):
+
         subset = torch.utils.data.Subset(dataset, subset_indices)
         return subset
     

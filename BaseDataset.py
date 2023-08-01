@@ -304,7 +304,8 @@ if __name__ == "__main__":
     
     length_dataset = mydataset.__len__()
     print(length_dataset)
-    for i in range(16):
+    for i in range(length_dataset):
+        '''
         data, label = mydataset.__getitem__(i)
         data = data.squeeze().numpy()
         label = label.squeeze().numpy()
@@ -317,3 +318,5 @@ if __name__ == "__main__":
 
         plt.tight_layout()
         plt.show()
+        '''
+        data, label = mydataset.__getitem__(i)

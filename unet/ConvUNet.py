@@ -208,58 +208,6 @@ class ConvUNet(L.LightningModule):
 
         logger.success('Done: configure optimizer.')
         return [optimizer]
-        '''scheduler_cfg = optim_cfg.Scheduler
-
-        if scheduler_cfg.type is None or scheduler_cfg.type == "none":
-            logger.success('Done: configure optimizer.')
-            return [optimizer]
-
-        logger.opt(ansi=True).info(f'scheduler: <yellow>{scheduler_cfg.type}</>')
-        if scheduler_cfg.type == 'linear':
-            scheduler = (
-                {
-                    "scheduler": torch.optim.lr_scheduler.LinearLR(optimizer=optimizer,
-                                                                   start_factor=scheduler_cfg.start_f,
-                                                                   end_factor=scheduler_cfg.end_f,
-                                                                   total_iters=scheduler_cfg.total_iters,
-                                                                   )
-                }
-            )
-        elif scheduler_cfg.type == "plateau":
-            scheduler = (
-                {
-                    "scheduler": torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer=optimizer,
-                                                                            mode=scheduler_cfg.mode,
-                                                                            factor=scheduler_cfg.factor,
-                                                                            patience=scheduler_cfg.patience,
-                                                                            cooldown=scheduler_cfg.cooldown,
-                                                                            min_lr=scheduler_cfg.min_lr),
-                    "monitor": scheduler_cfg.monitor
-                }
-            )
-        elif scheduler_cfg.type == "noam":
-            scheduler = (
-               {
-                    "scheduler": NoamLR(optimizer=optimizer, warmup_steps=scheduler_cfg.warmup),
-                    "interval": "step",  # runs per batch rather than per epoch
-                    "frequency": 1,
-                }
-            )
-        elif scheduler_cfg.type == "cosine":
-            scheduler = (
-                {
-                    "scheduler": torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer=optimizer,
-                                                                                      T_0=scheduler_cfg.cosine_t0),
-                    "interval": "step",  # runs per batch rather than per epoch
-                    "frequency": 1,
-                }
-            )
-        else:
-            logger.exception(f"Invalid option for scheduler: {scheduler_cfg.type} - supported scheduler: none, noam, cosine")
-            raise ValueError(f"Invalid option for scheduler: {scheduler_cfg.type} - supported scheduler: none, noam, cosine")
-
-        logger.success('Done: configure optimizer and lr_scheduler.')
-        return [optimizer], [scheduler]'''
 
 
     def training_step(self, batch, batch_idx):
@@ -342,11 +290,15 @@ class ConvUNet(L.LightningModule):
         return model#, OmegaConf.create(torch_ckpt["hyper_parameters"])
 
 if __name__ == "__main__":
-    model = ConvUNet(image_channels=1, output_channels=1)
+    model = ConvUNet()
     #model.test_model(torch.rand(8, 1, 512, 512))
     #summary(model, (1, 256, 256), batch_size=8)
 
+    '''
     x = torch.rand(8, 1, 512, 512)
     train_dataloader = torch.utils.data.DataLoader(x, batch_size=1)
     trainer = L.Trainer(max_epochs=5)
     trainer.fit(model, train_dataloader)
+    '''
+
+    print(isinstance(model, L.LightningModule))
