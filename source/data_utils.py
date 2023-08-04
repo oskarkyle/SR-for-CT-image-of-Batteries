@@ -10,22 +10,10 @@ from torchvision import transforms
 
 import matplotlib.pyplot as plt
 
-from BaseDataset import BaseDataset
+from source.BaseDataset import BaseDataset
 
 class prepare_data:
-    @staticmethod
-    def prepare_dataset(data_root, dataset_dir, transform_cfgs, preprocess_cfgs, size, tile_grid):
-        """ Prepare dataset for training and testing
-        Args:
-            data_root: root path of dataset
-            dataset_dir: directory of dataset
-            transform_cfgs: configurations for transform
-            preprocess_cfgs: configurations for preprocess
-        Returns:
-            dataset object
-        """
-        dataset = BaseDataset('SR', 'train', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
-        return dataset
+    
     @staticmethod
     def prepare_dataloader(dataset, batch_size, split_factor=0.8, shuffle=True, num_workers=None):
         """ Prepare dataloader for training and testing
@@ -100,7 +88,7 @@ class prepare_data:
         #titles = ['input', 'label']
         length = dataset.__len__()
         print(length)
-        for i in range(length):
+        for i in range(16):
             input, label = dataset.__getitem__(i)
 
             print(i, input.shape, label.shape)

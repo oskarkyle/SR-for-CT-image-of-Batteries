@@ -11,7 +11,7 @@ from torch import nn
 #from torchsummary import summary
 #from src.model.base.BaseModel import PLModel
 
-from unet.blocks import Swish, ConvBlock, SkipConnection, CombineConnection
+from model.unet.blocks import Swish, ConvBlock, SkipConnection, CombineConnection
 #from model.activations.activation import Swish
 
 class ConvUNet(L.LightningModule):
