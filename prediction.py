@@ -13,9 +13,9 @@ import time
 from torchvision import transforms
 from typing import Any, Tuple, Union, List, Sequence
 
-from BaseDataset import BaseDataset
-from data_utils import prepare_data
-from unet.ConvUNet import *
+from source.BaseDataset import BaseDataset
+from source.data_utils import prepare_data
+from model.unet.ConvUNet import *
 
 def is_lightning_module(model):
     return isinstance(model, L.LightningModule)

@@ -15,8 +15,8 @@ from lightning.pytorch.callbacks import LearningRateMonitor
 
 import matplotlib.pyplot as plt
 
-from unet.ConvUNet import *
-from data_utils import prepare_data
+from model.unet.ConvUNet import *
+from source.data_utils import *
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-g', '--tile_grid', dest='tile_grid', type=int, default=4, help='The number of tiles in each row/column in tiff')
@@ -47,6 +47,8 @@ class TrainLossPlotter(Callback):
         plt.show()
 
 
+
+
 if __name__ == '__main__':
     data_root = r'H:\SR_for_CT_image_of_Batteries'
     dataset_dir = [r'\dataset\pristine']
@@ -72,6 +74,20 @@ if __name__ == '__main__':
 
     model = ConvUNet()
 
-    trainer = L.Trainer(max_epochs=1, callbacks=[LearningRateMonitor(logging_interval='epoch'), TrainLossPlotter('output')])
+    trainer = L.Trainer(max_epochs=1) #callbacks=[LearningRateMonitor(logging_interval='epoch'), TrainLossPlotter('output')]
     
     trainer.fit(model, train_dataloader, test_dataloader)
+
+    train_loss = trainer.callback_metrics['train_loss']
+    val_loss = trainer.callback_metrics['val_loss']
+
+    # Plot the train and validation loss curves
+    epochs = range(1, len(train_loss) + 1)
+    plt.plot(epochs, train_loss, label='Train Loss')
+    plt.plot(epochs, val_loss, label='Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.title('Train and Validation Loss Curves')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
