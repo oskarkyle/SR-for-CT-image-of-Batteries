@@ -3,12 +3,10 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 from typing import Tuple, Optional, List, Union
 import torch
 from pathlib import Path
-from collections import defaultdict
 from natsort import natsorted
 
 from torchvision.io import read_image, ImageReadMode
 from torch.utils.data import Dataset as DS
-from torch.utils.data import DataLoader
 from transform.Transforms import Transforms
 from preprocess.Preprocessor import Preprocessor
 

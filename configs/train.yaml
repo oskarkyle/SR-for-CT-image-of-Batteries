@@ -3,7 +3,7 @@
 # General training parameters
 
 train_params:
-  max_epochs: 100
+  
   batch_size: 4
 
 # Data parameters

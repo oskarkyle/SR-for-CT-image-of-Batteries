@@ -1,6 +1,5 @@
 from typing import Any, Tuple, Union, List, Sequence
 from loguru import logger
-from omegaconf import DictConfig
 import lightning as L
 from timm.scheduler.scheduler import Scheduler
 from torch.optim import Optimizer

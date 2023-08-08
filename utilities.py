@@ -2,8 +2,7 @@ import os
 import torch 
 import torch.nn as nn
 import matplotlib.pyplot as plt
-import hydra
-from omegaconf import DictConfig, ListConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf
 import lightning as L
 from lightning.pytorch.callbacks import Callback
 
@@ -91,7 +90,9 @@ def plot_img(predictions, pred_dataloader):
             pred.append(img)
 
     input, label = prepare_data.check_dataloader(pred_dataloader)
-
+    
+    vmin = 0.2
+    vmax = 0.9
     if len(pred) == len(input):
         for i in range(len(pred)):
             
@@ -100,7 +101,7 @@ def plot_img(predictions, pred_dataloader):
             ax[0].imshow(input[i], cmap='gray')
             title = ax[0].set_title('Input')
             title.set_fontsize(20)
-            ax[1].imshow(pred[i], cmap='gray')
+            ax[1].imshow(pred[i], cmap='gray', vmin = vmin, vmax = vmax)
             title = ax[1].set_title('Prediction')
             title.set_fontsize(20)
             ax[2].imshow(label[i], cmap='gray')

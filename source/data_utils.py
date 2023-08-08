@@ -1,4 +1,3 @@
-import imp
 import multiprocessing
 
 from numpy import block
