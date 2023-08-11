@@ -1,0 +1,20 @@
+dataset:
+  task: SR
+  mode: train
+  data_root: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries 
+  dataset_dir: /dataset/pristine
+  tile_size: 512
+  tile_grid: 4
+
+  preprocess_cfg:
+    convert_dtype: null
+    binning:
+      binning_factor: 8
+
+pred:
+  subset_indices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+  batch_size: 4
+
+model:
+  ckp_path: ./lightning_logs/version_5/checkpoints/epoch=0-step=9280.ckpt
+  
