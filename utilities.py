@@ -80,7 +80,7 @@ def pred_data(cfg: DictConfig, preprocess_cfgs: DictConfig, transform_cfgs: Dict
 def is_lightning_module(model):
     return isinstance(model, L.LightningModule)
 
-
+# To plot the images from the prediction
 def plot_img(predictions, pred_dataloader):
     pred = []
     for i, batch in enumerate(predictions):
@@ -91,8 +91,9 @@ def plot_img(predictions, pred_dataloader):
 
     input, label = prepare_data.check_dataloader(pred_dataloader)
     
-    vmin = 0.2
-    vmax = 0.9
+    vmin = 0
+    vmax = 1
+    
     if len(pred) == len(input):
         for i in range(len(pred)):
             
@@ -108,8 +109,8 @@ def plot_img(predictions, pred_dataloader):
             title = ax[2].set_title('Label')
             title.set_fontsize(20)
             plt.tight_layout()
-            plt.savefig(f'./results/simple_{i+1}.png')
             plt.show()
+            
 
 
 

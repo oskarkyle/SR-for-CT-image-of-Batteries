@@ -1,6 +1,7 @@
 import hydra
 import torch
 from omegaconf import DictConfig, OmegaConf
+from torch.utils.data import DataLoader
 import lightning as L
 
 from source.BaseDataset import BaseDataset
@@ -21,7 +22,9 @@ def main(cfg:DictConfig):
     pred_DS = torch.utils.data.Subset(DS, subset_indices)
     pred_DL = DataLoader(pred_DS, batch_size)
 
+    # prepare_data.check_dataset(pred_DS)
     # Load model
+
     ckpt_path = cfg.model.ckp_path
 
     model: L.LightningModule = ConvUNet().restore(ckpt_path)
