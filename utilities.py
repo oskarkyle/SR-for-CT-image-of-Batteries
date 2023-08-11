@@ -29,8 +29,8 @@ def data(cfg: DictConfig, preprocess_cfgs: DictConfig, transform_cfgs: DictConfi
 def curves_plot(train_loss: L.Trainer.callback_metrics, val_loss: L.Trainer.callback_metrics):
     # Plot the train and validation loss curves
     epochs = range(1, len(train_loss) + 1)
-    plt.plot(epochs, train_loss, label='Train Loss')
-    plt.plot(epochs, val_loss, label='Validation Loss')
+    plt.plot(epochs, train_loss, vmin=0, vmax=1, label='Train Loss')
+    plt.plot(epochs, val_loss, vmin=0, vmax=1, label='Validation Loss')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
     
