@@ -37,6 +37,7 @@ def curves_plot(train_loss: L.Trainer.callback_metrics, val_loss: L.Trainer.call
     plt.title('Train and Validation Loss Curves')
     plt.legend()
     plt.grid(True)
+    plt.savefig('output/loss_curves.png')
     plt.show()
 
 

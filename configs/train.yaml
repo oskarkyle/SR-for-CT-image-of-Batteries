@@ -15,8 +15,8 @@ dataset:
   mode: train
   data_root: /home/tte/PycharmProjects/students/haorui/SR_for_CT_image_of_Batteries
   dataset_dir: /dataset/pristine
-  tile_size: 128
-  tile_grid: 2
+  tile_size: 512
+  tile_grid: 4
 
   preprocess_cfg:
     convert_dtype: null
