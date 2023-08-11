@@ -23,7 +23,7 @@ dataset:
     binning:
       binning_factor: 8
 
-  transform_cfg:
+  transforms_cfg:
     propability: 1.0
     RandomAffine:
       p: 0.5
