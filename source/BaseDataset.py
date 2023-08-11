@@ -74,7 +74,7 @@ class BaseDataset(DS):
         self.page_count_in_each_tiff = []
         self.tiff_intersection_border = [0]
         #self.check_dataset_constrains()
-        self.transform_cfg = transforms_cfg
+        self.transform_cfg = None # transforms_cfg
         self.transform = self.get_transforms(transforms_cfg)
         self.preprocess_cfg = preprocess_cfg
         self.preprocess = self.get_preprocessor(preprocess_cfg)

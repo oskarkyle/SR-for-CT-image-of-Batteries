@@ -23,7 +23,7 @@ class Transforms:
     """
 
     def __init__(self, transforms_cfg: DictConfig):
-        self.p = transforms_cfg.pop('propability')
+        self.p = 1 # transforms_cfg.pop('propability')
         self.transforms_cfg = transforms_cfg
 
         self.transforms_map = {
