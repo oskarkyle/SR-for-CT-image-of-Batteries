@@ -10,22 +10,6 @@ from lightning.pytorch.callbacks import Callback
 from source.BaseDataset import *
 from source.data_utils import *
 
-def data(cfg: DictConfig, preprocess_cfgs: DictConfig, transform_cfgs: DictConfig = None):
-    config = OmegaConf.load(cfg)
-    preprocess_cfgs = OmegaConf.load(preprocess_cfgs)
-
-    data_root = config.data_params.data_root
-    dataset_dir = config.data_params.dataset_dir
-    tile_grid = config.data_params.tile_grid
-    size = config.data_params.tile_size
-    batch_size = config.train_params.batch_size
-
-    dataset = BaseDataset('SR', 'train', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
-    train_dataloader, test_dataloader = prepare_data.prepare_dataloader(dataset, batch_size)
-
-    return dataset, train_dataloader, test_dataloader
-
-
 def curves_plot(train_loss: L.Trainer.callback_metrics, val_loss: L.Trainer.callback_metrics):
     # Plot the train and validation loss curves
     epochs = range(1, len(train_loss) + 1)
@@ -59,30 +43,12 @@ class TrainLossPlotter(Callback):
         plt.savefig(os.path.join(self.save_dir, 'train_loss_curve.png'))
         plt.show()
 
-def pred_data(cfg: DictConfig, preprocess_cfgs: DictConfig, transform_cfgs: DictConfig = None):
-    config = OmegaConf.load(cfg)
-    preprocess_cfgs = OmegaConf.load(preprocess_cfgs)
-
-    data_root = config.data_params.data_root
-    dataset_dir = config.data_params.dataset_dir
-    tile_grid = config.data_params.tile_grid
-    size = config.data_params.tile_size
-    batch_size = config.train_params.batch_size
-
-    dataset = BaseDataset('SR', 'pred', size, tile_grid, dataset_dir, data_root, transform_cfgs, preprocess_cfgs)
-    subset_indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
-
-    subset = torch.utils.data.Subset(dataset, subset_indices)
-    pred_dataloader = DataLoader(subset, batch_size=batch_size, shuffle=False)
-
-    return subset, pred_dataloader
-
 
 def is_lightning_module(model):
     return isinstance(model, L.LightningModule)
 
 # To plot the images from the prediction
-def plot_img(predictions, pred_dataloader):
+def plot_pred_imgs(predictions, pred_dataloader):
     pred = []
     for i, batch in enumerate(predictions):
         for j, img in enumerate(batch):
@@ -111,14 +77,4 @@ def plot_img(predictions, pred_dataloader):
             title.set_fontsize(20)
             plt.tight_layout()
             plt.show()
-            
-
-
-
-if __name__ =='__main__':
-    cfg = r'.\configs\train.yaml'
-    preprocess_cfgs = r'.\configs\preprocess.yaml'
-
-    dataset, train_dataloader, test_dataloader = data(cfg, preprocess_cfgs)
-
-    prepare_data.check_dataset(dataset)
+            plt.savefig(f'./results/pred_{i}.png')

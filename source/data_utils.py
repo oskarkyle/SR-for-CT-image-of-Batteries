@@ -89,11 +89,11 @@ class prepare_data:
         print(length)
         if length > 0:
             print('Dataset is OK')
-            
+        print('Checking dataset...')
         for i in range(16):
             input, label = dataset.__getitem__(i)
 
-            print(i, input.shape, label.shape)
+            # print(i, input.shape, label.shape)
             input = input.squeeze(0).numpy()
             label = label.squeeze(0).numpy()
 
@@ -109,6 +109,7 @@ class prepare_data:
             plt.pause(0.5)
             plt.close()
             time.sleep(0.5)           
+        print('Dataset is checked!')
 
     def check_dataloader(dataloader):
         input = []

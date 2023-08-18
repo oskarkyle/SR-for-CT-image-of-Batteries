@@ -13,8 +13,8 @@ def main(cfg: DictConfig)-> None:
 
 if __name__ == "__main__":
     
-    data_root = "/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries"#r'H:\SR_for_CT_image_of_Batteries'
-    dataset_dir = "/dataset/pristine"#[r'\dataset\pristine']
+    data_root = "/Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries" #r'H:\SR_for_CT_image_of_Batteries'
+    dataset_dir = ["/dataset/pristine"] #[r'\dataset\pristine']
 
     cfgs_path_p = data_root + '/configs/preprocess.yaml'
     cfgs_path_t = data_root + '/configs/transform.yaml'

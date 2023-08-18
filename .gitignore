@@ -12,7 +12,7 @@ Dataset/
 outputs/
 .DS_Store
 version_1/
-
+results/
 # Ignore any contents in Preprocessing directories
 ./Preprocessing/__pycache__/
 ./Preprocessing/Images/

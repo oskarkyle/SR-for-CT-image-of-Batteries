@@ -48,7 +48,10 @@ class Transforms:
 
         # Apply relevant transform operations to image and mask
         for transform_name, transform_param in self.transforms_cfg.items():
-            if self.transforms_map.get(transform_name)['channel'] and not self.transforms_map.get(transform_name)['channel'] == image.shape[0]: continue # skip trafos that need right channels
+            if transform_name == 'propability': 
+                continue
+            if self.transforms_map.get(transform_name)['channel'] and not self.transforms_map.get(transform_name)['channel'] == image.shape[0]: 
+                continue # skip trafos that need right channels
             transforms_func: _AugmentationBase = self.transforms_map.get(transform_name)['func']
             for_mask = self.transforms_map.get(transform_name)['mask']
             if transform_name is not None: # ------------------------------------- for image

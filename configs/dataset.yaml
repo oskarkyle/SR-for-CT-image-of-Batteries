@@ -1,4 +1,0 @@
-data_root: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries 
-dataset_dir: /dataset/pristine
-tile_size: 512
-tile_grid: 4
