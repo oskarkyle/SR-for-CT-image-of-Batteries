@@ -87,6 +87,9 @@ class prepare_data:
         #titles = ['input', 'label']
         length = dataset.__len__()
         print(length)
+        if length > 0:
+            print('Dataset is OK')
+            
         for i in range(16):
             input, label = dataset.__getitem__(i)
 

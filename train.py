@@ -3,7 +3,7 @@ import hydra
 from model.unet.ConvUNet import *
 from utilities import *
 
-@hydra.main(config_path="configs", config_name="train")
+@hydra.main(version_base=None, config_path="configs", config_name="train")
 def main(cfg:DictConfig):
 
     DS = BaseDataset(**cfg.dataset)
@@ -11,7 +11,7 @@ def main(cfg:DictConfig):
 
     if cfg.check_dataset:
         prepare_data.check_dataset(DS)
-
+"""
     # Load model
     model = ConvUNet()
 
@@ -25,6 +25,6 @@ def main(cfg:DictConfig):
 
     # Plot the train and validation loss curves
     curves_plot(train_loss, val_loss)
-
+"""
 if __name__ == '__main__':
     main()
