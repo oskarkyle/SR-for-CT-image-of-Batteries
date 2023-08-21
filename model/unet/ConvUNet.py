@@ -44,15 +44,15 @@ class ConvUNet(L.LightningModule):
                  #model_cfg: DictConfig,
                  image_channels: int = 1,
                  output_channels: int = 1,
-                 c_factor: int = 6,  # = 2^6 = 64 dim der TimeEmbeddings
-                 ch_mults: Union[Tuple[int, ...], List[int]] = (1, 2, 3, 4),
-                 n_blocks: int = 2,
-                 n_layers: int = 2,
+                 c_factor: int = 5,  # = 2^6 = 64 dim der TimeEmbeddings
+                 ch_mults: Union[Tuple[int, ...], List[int]] = (1, 2, 3, 4, 5),
+                 n_blocks: int = 1,
+                 n_layers: int = 1,
                  scale_factor: int = 2,
                  kernel_size: int = 3,
                  n_groups: int = 32,
                  verbose: bool = True,
-                 lr: float = 1e-3,
+                 lr: float = 1e-4,
                  optimizer_type: str = "adam",
                  maximize: bool = False
                  ):
