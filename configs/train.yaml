@@ -8,7 +8,7 @@ train_params:
   
   batch_size: 2
 
-check_dataset: False
+check_dataset: True
 
 dataset:
   task: SR
@@ -55,3 +55,8 @@ dataset:
     RandomVerticalFlip:
       p: 0.5
       p_batch: 1.0
+
+    RandomSaturation:
+      p: 0.5
+    RandomHue:
+      p: 0.5

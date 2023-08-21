@@ -22,10 +22,11 @@ def main(cfg:DictConfig):
     logger = TensorBoardLogger('outputs', name='SR')
     trainer.fit(model, train_DL, test_DL, logger=logger)
 
-    '''train_loss = trainer.callback_metrics['train_loss']
-    val_loss = trainer.callback_metrics['val_loss']'''
+    # train_loss = trainer.callback_metrics['train_loss']
+    # val_loss = trainer.callback_metrics['val_loss']
 
     # Plot the train and validation loss curves
     # curves_plot(train_loss, val_loss)
 if __name__ == '__main__':
+    # Plot curves with tensorboard
     main()
