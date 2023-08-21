@@ -24,39 +24,46 @@ dataset:
       binning_factor: 8
 
   transforms_cfg:
-    propability: 0.9
+    propability: 1.0
     RandomAffine:
-      degrees:
-      - 0
-      - 0
-    RandomBrightness:
-      brightness:
-      - 1.1
-      - 1.12
-    RandomContrast:
-      contrast:
-      - 1
-      - 1
-
-    RandomGaussianNoise:
-      p: 0.75
-      mean: 0.0
-      std: 0.5
-    RandomGaussianBlur:
-      kernel_size_range:
-      - 1
-      - 3
-      sigma_range:
-      - 0.1
-      - 1.0
+      p: 0.5
+      degrees: 90
+      translate:
+        - 0.0
+        - 1.0
+      scale:
+        - 0.9
+        - 1.1
+      # shear: ()
+    #RandomCrop:
+    #  size: ()
     RandomHorizontalFlip:
       p: 0.5
-      p_batch: 1.0
     RandomVerticalFlip:
       p: 0.5
-      p_batch: 1.0
-
+    RandomBrightness:
+      p: 0.5
+      brightness:
+        - 0.9
+        - 1.1
+    RandomContrast:
+      p: 0.5
+      contrast:
+        - 0.9
+        - 1.1
     RandomSaturation:
       p: 0.5
+      saturation:
+        - 0.9
+        - 1.1
     RandomHue:
       p: 0.5
+      hue:
+       - -0.1
+       - 0.1
+    #RandomMedianBlur:
+    #  p: 1.0
+    RandomGaussianNoise:
+      p: 1.0
+      mean: 0.0
+      std: 0.1
