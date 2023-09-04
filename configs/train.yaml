@@ -1,0 +1,119 @@
+# train.yaml
+
+# General training parameters
+split_ratios:
+  train: 0.8
+  val: 0.1
+  test: 0.1
+
+train:
+  batch_size: 2
+  epochs: 1
+  save_dir: /model/checkpoints/
+  save_name: best_model
+  log_dir: /logs
+  precision: 16
+  callbacks: 
+    monitor: val_loss
+    patience: 200
+    mode: min    
+  lr: 0.0001
+  accelerator: mps
+
+check_dataset: True
+
+dataset:
+  task: SR
+  mode: train
+  data_root: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries
+  dataset_dir: /dataset/pristine
+  tile_size: 512
+  tile_grid: 4
+
+  preprocess_cfg:
+    convert_dtype: null
+    binning:
+      binning_factor: 8
+    
+  transforms_cfg:
+    propability: 0.9
+    RandomAffine:
+      degrees:
+      - 0
+      - 0
+    RandomBrightness:
+      brightness:
+      - 1.1
+      - 1.12
+    RandomContrast:
+      contrast:
+      - 1
+      - 1
+
+    RandomGaussianNoise:
+      p: 0.75
+      mean: 0.0
+      std: 0.5
+    RandomGaussianBlur:
+      kernel_size_range:
+      - 1
+      - 3
+      sigma_range:
+      - 0.1
+      - 1.0
+    RandomHorizontalFlip:
+      p: 0.5
+      p_batch: 1.0
+    RandomVerticalFlip:
+      p: 0.5
+      p_batch: 1.0
+
+    RandomSaturation:
+      p: 0.5
+    RandomHue:
+      p: 0.5
+
+model:
+  model_name: SR_model
+  automatic_optimization: true
+  image_channels: 1
+  output_channels: 1
+  c_factor: 6
+  ch_mults:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  n_blocks: 1
+  n_layers: 1
+  scale_factor: 2
+  kernel_size: 3
+  n_groups: 32
+  verbose: True 
+
+  Optimizer:
+    lr: 0.0001
+    optimizer: adam
+    maximize: False
+    betas:
+    - 0.9
+    - 0.98
+    eps: 1.0e-06
+    weight_decay: 1.0e-03
+    momentum: 0.9
+    Scheduler:
+      type: plateau
+      mode: min
+      factor: 0.1
+      threshold: 0.0001
+      min_lr: 1.0e-10
+      patience: 8
+      cooldown: 0
+      monitor: val_loss
+
+  loss_func:
+    name: MSELoss
+    args:
+      reduction: mean
+

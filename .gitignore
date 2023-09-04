@@ -1,0 +1,12 @@
+# Ignore any generated files or directories
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+dataset/
+.DS_Store
+results/
+outputs/
+
+model/checkpoints/*.ckpt
