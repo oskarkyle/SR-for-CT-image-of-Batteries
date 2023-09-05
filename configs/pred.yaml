@@ -14,23 +14,33 @@ dataset:
   transforms_cfg:
     propability: 0.9
     RandomAffine:
+      p: 0.5
       degrees:
       - 0
-      - 0
+      - 90
+      translate:
+      - 0.0
+      - 1.0
+      scale:
+      - 0.9
+      - 1.0
     RandomBrightness:
+      p: 0.5
       brightness:
       - 1.1
       - 1.12
     RandomContrast:
+      p: 0.5
       contrast:
       - 1
       - 1
 
     RandomGaussianNoise:
-      p: 0.75
+      p: 0.5
       mean: 0.0
       std: 0.5
     RandomGaussianBlur:
+      p: 0.5
       kernel_size_range:
       - 1
       - 3
@@ -39,15 +49,20 @@ dataset:
       - 1.0
     RandomHorizontalFlip:
       p: 0.5
-      p_batch: 1.0
     RandomVerticalFlip:
       p: 0.5
-      p_batch: 1.0
+
+    RandomSaturation:
+      p: 0.5
+    RandomHue:
+      p: 0.5
 
 pred:
   batch_size: 4
-  ckpt_path: /model/checkpoints/best_model.ckpt
+  ckpt_path: /outputs/model/checkpoints/best_model.ckpt
   device: mps
+  output_dir: /results/
+  output_name: pred_mean
 
 model:
   model_name: SR_model
@@ -55,28 +70,22 @@ model:
   image_channels: 1
   output_channels: 1
   c_factor: 6
-  ch_mults:
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
+  ch_mults: 6
   n_blocks: 1
   n_layers: 1
   scale_factor: 2
   kernel_size: 3
   n_groups: 32
-  verbose: True 
-
+  verbose: true
   Optimizer:
-    lr: 0.0001
-    optimizer: adam
-    maximize: False
+    lr: 0.001
+    optimizer: adamw
+    maximize: false
     betas:
     - 0.9
     - 0.98
     eps: 1.0e-06
-    weight_decay: 1.0e-03
+    weight_decay: 0.001
     momentum: 0.9
     Scheduler:
       type: plateau
@@ -87,10 +96,9 @@ model:
       patience: 8
       cooldown: 0
       monitor: val_loss
-
   loss_func:
     name: MSELoss
     args:
-      reduction: mean
+      reduction: sum
 
 length: 10

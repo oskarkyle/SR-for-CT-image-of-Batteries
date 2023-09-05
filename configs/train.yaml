@@ -9,9 +9,9 @@ split_ratios:
 train:
   batch_size: 2
   epochs: 1
-  save_dir: /model/checkpoints/
+  save_dir: outputs/model/checkpoints/
   save_name: best_model
-  log_dir: /logs
+  log_dir: outputs/logs/
   precision: 16
   callbacks: 
     monitor: val_loss
@@ -38,23 +38,33 @@ dataset:
   transforms_cfg:
     propability: 0.9
     RandomAffine:
+      p: 0.5
       degrees:
       - 0
-      - 0
+      - 90
+      translate:
+      - 0.0
+      - 1.0
+      scale:
+      - 0.9
+      - 1.0
     RandomBrightness:
+      p: 0.5
       brightness:
       - 1.1
       - 1.12
     RandomContrast:
+      p: 0.5
       contrast:
       - 1
       - 1
 
     RandomGaussianNoise:
-      p: 0.75
+      p: 0.5
       mean: 0.0
       std: 0.5
     RandomGaussianBlur:
+      p: 0.5
       kernel_size_range:
       - 1
       - 3
@@ -63,10 +73,8 @@ dataset:
       - 1.0
     RandomHorizontalFlip:
       p: 0.5
-      p_batch: 1.0
     RandomVerticalFlip:
       p: 0.5
-      p_batch: 1.0
 
     RandomSaturation:
       p: 0.5
@@ -115,5 +123,4 @@ model:
   loss_func:
     name: MSELoss
     args:
-      reduction: mean
-
+      reduction: sum

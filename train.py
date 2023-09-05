@@ -104,6 +104,5 @@ def main(cfg:DictConfig):
                      )
     start_training(cfg)
 
-
 if __name__ == '__main__':
     main()

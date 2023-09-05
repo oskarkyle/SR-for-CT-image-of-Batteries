@@ -159,7 +159,7 @@ class ConvUNet(L.LightningModule):
 
         if self.verbose: logger.info(f"Test model forward pass")
         y = self(x)
-        self.verbose: logger.success(f"Done: Test passed")
+        logger.success(f"Done: Test passed")
 
     def configure_optimizers(self) -> Tuple[Union[Optimizer, Sequence[Optimizer]], Union[Scheduler, Sequence[Scheduler]]]:
         """
@@ -346,7 +346,7 @@ class ConvUNet(L.LightningModule):
         logger.info(f'Model saved to {model_path}')
 
     @classmethod
-    def restore(cls: L.LightningModule, ckpt: str, map_location: Union[torch.device, str, int] = "cpu"):
+    def restore(cls: L.LightningModule, ckpt: str, map_location: Union[torch.device, str, int] = "mps"):
         """
         Restores a PyTorch Lightning model from a checkpoint file.
 
@@ -367,14 +367,15 @@ class ConvUNet(L.LightningModule):
         """
 
 
-        torch_ckpt = torch.load(ckpt)
+        torch_ckpt = torch.load(ckpt, map_location=map_location)
         if "hyper_parameters" not in torch_ckpt:
             logger.error("Checkpoint does not contain hyperparameters.")
             raise RuntimeError("Checkpoint does not contain hyperparameters.")
+
 
         logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {cls.__name__}\n\tcheckpoint: {ckpt}")
         model = cls.load_from_checkpoint(checkpoint_path=ckpt, map_location=map_location)
         logger.success(f"Successfully loaded checkpoint")
 
-        return model , OmegaConf.create(torch_ckpt["hyper_parameters"])
+        return model, OmegaConf.create(torch_ckpt["hyper_parameters"])
 
