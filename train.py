@@ -61,8 +61,12 @@ def setup_logger(cfg:DictConfig):
 def start_training(cfg: DictConfig):
     model_cfg = cfg.model
     train_cfg = cfg.train
-    myckpt_path = os.getcwd() + train_cfg.save_dir + train_cfg.save_name +  '.ckpt'
+    myckpt_dir = os.getcwd() + train_cfg.save_dir
 
+    if not os.path.exists(myckpt_dir):
+        os.mkdir(myckpt_dir)
+
+    myckpt_path = os.getcwd() + train_cfg.save_dir + train_cfg.save_name +  '.ckpt'
     checkpoint_callback = ModelCheckpoint(
         monitor = train_cfg.callbacks.monitor, 
         dirpath = os.getcwd() + train_cfg.save_dir,  

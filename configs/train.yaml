@@ -9,9 +9,9 @@ split_ratios:
 train:
   batch_size: 2
   epochs: 1
-  save_dir: outputs/model/checkpoints/
+  save_dir: /outputs/model/checkpoints/
   save_name: best_model
-  log_dir: outputs/logs/
+  log_dir: /outputs/logs
   precision: 16
   callbacks: 
     monitor: val_loss
