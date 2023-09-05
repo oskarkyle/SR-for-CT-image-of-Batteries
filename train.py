@@ -84,10 +84,15 @@ def start_training(cfg: DictConfig):
     model = init_model(model_cfg)
 
 
-    trainer = L.Trainer(max_epochs=train_cfg.epochs, callbacks=[checkpoint_callback,early_stop_callback],precision=train_cfg.precision , accelerator=train_cfg.accelerator,logger = setup_logger(cfg),log_every_n_steps=1)
+    trainer = L.Trainer(max_epochs=train_cfg.epochs,
+                         callbacks=[checkpoint_callback,early_stop_callback],
+                         precision=train_cfg.precision , 
+                         accelerator=train_cfg.accelerator,
+                         logger = setup_logger(cfg),
+                         log_every_n_steps=1)
+    
     if os.path.exists(myckpt_path):
-        trainer.fit(model, train_dataloader,validation_dataloader)
-        trainer.save_checkpoint(myckpt_path)
+        trainer.fit(model, train_dataloader,validation_dataloader, myckpt_path)
     else:
         trainer.fit(model, train_dataloader,validation_dataloader)
 
