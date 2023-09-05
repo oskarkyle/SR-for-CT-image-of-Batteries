@@ -170,14 +170,3 @@ class Preprocessor:
         resized = kornia.geometry.transform.resize(binned, tuple(shape), interpolation='nearest')
 
         return resized
-    '''
-    @staticmethod
-    def binning(image, binning_factor, size):
-        mat = np.array(image)
-        mat_reshape = mat.reshape(mat.shape[0]//binning_factor, 2, mat.shape[1]//binning_factor, 2)
-        bin_mat = np.mean(mat_reshape, axis=(1, 3))
-    
-        resize = cv2.resize(bin_mat, (size, size), interpolation=cv2.INTER_CUBIC)
-
-        return resize
-    '''

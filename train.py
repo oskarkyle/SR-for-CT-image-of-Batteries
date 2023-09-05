@@ -42,7 +42,13 @@ def setup_dataloaders(cfg:DictConfig):
     val_ratio = split_ratios.val 
     test_ratio = split_ratios.test
 
-    train_dataset,validation_dataset,test_dataset = random_split(dataset,[train_ratio,val_ratio,test_ratio])
+    dataset_size = dataset.__len__()
+    train_size = int(dataset_size * train_ratio)
+    val_size = int(dataset_size * val_ratio)
+    test_size = dataset_size - train_size - val_size
+
+    train_dataset,validation_dataset,test_dataset = random_split(dataset,[train_size,val_size,test_size])
+
     train_dataloader = DataLoader(train_dataset, batch_size = cfg.train.batch_size, shuffle = True,collate_fn= custom_collate,pin_memory=True)
     validation_dataloader = DataLoader(validation_dataset, batch_size = cfg.train.batch_size, shuffle = False,collate_fn= custom_collate,pin_memory=True)
     test_dataloader = DataLoader(test_dataset, batch_size = cfg.train.batch_size, shuffle = False,collate_fn= custom_collate,pin_memory=True)
