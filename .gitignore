@@ -9,4 +9,4 @@ dataset/
 results/
 outputs/
 
-outputs/model/checkpoints/*.ckpt
+model/checkpoints/*.ckpt
