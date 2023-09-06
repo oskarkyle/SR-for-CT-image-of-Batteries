@@ -106,18 +106,3 @@ def start_training(cfg: DictConfig):
     else:
         trainer.fit(model, train_dataloader,validation_dataloader)
 
-
-@hydra.main(version_base=None, config_path="configs", config_name="train")
-def main(cfg:DictConfig):
-    task = Task.init(project_name='SR_FOR_CT_IMGs', 
-                     task_name='SR_Train',
-                     task_type=Task.TaskTypes.training,
-                     reuse_last_task_id=False,
-                     auto_resource_monitoring=False,
-                     auto_connect_frameworks={"pytorch": False} # does not upload all the output models
-                     
-                     )
-    start_training(cfg)
-
-if __name__ == '__main__':
-    main()

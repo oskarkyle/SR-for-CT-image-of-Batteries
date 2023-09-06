@@ -20,15 +20,20 @@ def custom_collate(batch):
     return default_collate(batch)
 
 def load_model(cfg: DictConfig):
+    path = cfg.dataset.data_root
+    os.chdir(path)
     myckpt_path = os.getcwd() + cfg.pred.ckpt_path
+    logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {ConvUNet.__name__}\n\tcheckpoint: {myckpt_path}")
     model = ConvUNet.load_from_checkpoint(myckpt_path, map_location=torch.device('mps'), ch_mults=cfg.model.ch_mults, n_blocks=cfg.model.n_blocks, n_layers=cfg.model.n_layers)
+    logger.success(f"Successfully loaded checkpoint")
+
     return model
 
 def setup_pred_tiles_and_labels(cfg: DictConfig):
     tiles = []
     labels = []
     pred_DS = BaseDataset(**cfg.dataset)
-    subset_indices = list(range(0, cfg.length))
+    subset_indices = list(range(0, cfg.pred.length))
     pred_DS = Subset(pred_DS, subset_indices)
 
     for i in range(len(pred_DS)):
@@ -55,12 +60,5 @@ def inference(cfg: DictConfig):
         label = labels[i].squeeze(0)    
         output = output.squeeze(0).cpu().detach().numpy()
         pred = output.squeeze(0)
-        output_path = os.getcwd() + cfg.pred.output_dir + cfg.pred.output_name + f'_{i}.png'
+        output_path = cfg.dataset.data_root + cfg.pred.output_dir + cfg.pred.output_name + f'_{i}.png'
         save_image(input, pred, label, output_path)
-
-@hydra.main(version_base=None, config_path="configs", config_name="pred")
-def main(cfg:DictConfig):
-    inference(cfg)
-
-if __name__ == "__main__":
-    main()
