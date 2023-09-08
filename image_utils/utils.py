@@ -45,6 +45,43 @@ def convert_ycbcr_to_rgb(img):
         return torch.cat([r, g, b], 0).permute(1, 2, 0)
     else:
         raise Exception('Unknown Type', type(img))
+    
+def convert_gray_to_rgb(gray_image):
+    """
+    Convert a grayscale image to an RGB image by duplicating the grayscale values
+    into all three color channels (R, G, and B).
+
+    Args:
+        gray_image (numpy.ndarray): Input grayscale image of shape (height, width).
+
+    Returns:
+        numpy.ndarray: RGB image of shape (height, width, 3).
+    """
+    if len(gray_image.shape) != 2:
+        raise ValueError("Input image must be grayscale with shape (height, width).")
+
+    # Duplicate the grayscale image into all three color channels (R, G, B)
+    rgb_image = np.stack([gray_image] * 3, axis=-1)
+
+    return rgb_image
+
+def convert_tensor_to_numpy(tensor):
+    """
+    Convert a PyTorch tensor to a NumPy array.
+
+    Args:
+        tensor (torch.Tensor): Input PyTorch tensor.
+
+    Returns:
+        numpy.ndarray: NumPy array containing the same data as the input tensor.
+    """
+    if not isinstance(tensor, torch.Tensor):
+        raise ValueError("Input must be a PyTorch tensor.")
+
+    # Use tensor.cpu().detach().numpy() to convert the tensor to a NumPy array
+    numpy_array = tensor.squeeze().cpu().detach().numpy()
+
+    return numpy_array
 
 
 def calc_psnr(img1, img2):
