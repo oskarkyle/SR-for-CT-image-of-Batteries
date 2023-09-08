@@ -240,7 +240,6 @@ class BaseDataset(DS):
             idx (int or Tensor): Index of the sample to retrieve.
 
         Returns:
-            dict: A dictionary containing the data_path and label_path (if applicable) of the sample.
             Tensor: The data for the sample, preprocessed and transformed.
             Tensor: The label for the sample (if applicable), preprocessed and transformed.
         """
