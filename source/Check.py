@@ -26,7 +26,7 @@ class Check_data:
             axes[1].imshow(label, cmap='gray')
             title = axes[1].set_title('Normal')
             title.set_fontsize(20)
-            plt.savefig(f'./results/check_{i}.png')
+            #plt.savefig(f'./results/check_{i}.png')
             plt.tight_layout()
             plt.show(block=False)
             plt.pause(0.5)
