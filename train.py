@@ -1,4 +1,3 @@
-import hydra
 import lightning as L
 from lightning.pytorch.loggers import TensorBoardLogger
 from lightning.pytorch.callbacks import ModelCheckpoint
@@ -73,13 +72,13 @@ def start_training(cfg: DictConfig):
         os.mkdir(myckpt_dir)
 
     myckpt_path = os.getcwd() + train_cfg.save_dir + train_cfg.save_name +  '.ckpt'
+    oldckpt_path = os.getcwd() + cfg.pred.ckpt_path
     checkpoint_callback = ModelCheckpoint(
         monitor = train_cfg.callbacks.monitor, 
         dirpath = os.getcwd() + train_cfg.save_dir,  
         filename = train_cfg.save_name,  
         save_top_k = 1,  
-        mode = train_cfg.callbacks.mode
-        
+        mode = train_cfg.callbacks.mode        
     )
 
     early_stop_callback = (
@@ -91,9 +90,21 @@ def start_training(cfg: DictConfig):
     )
 
     train_dataloader,validation_dataloader,test_dataloager = setup_dataloaders(cfg)
-    model = init_model(model_cfg)
 
+    if os.path.isfile(oldckpt_path):
+        logger.info(f"Attempting to load checkpoint .. \n\tmodel_class: {ConvUNet.__name__}\n\tcheckpoint: {oldckpt_path}")
+        model = ConvUNet.load_from_checkpoint(oldckpt_path,
+                                            map_location=torch.device('mps'),
+                                            ch_mults=model_cfg.ch_mults,
+                                            n_blocks=model_cfg.n_blocks,
+                                            n_layers=model_cfg.n_layers
+        )
+        logger.success(f"Successfully loaded checkpoint")
 
+    else:
+        print("No checkpoint found, initializing new model")
+        model = init_model(model_cfg)
+    print(myckpt_path)
     trainer = L.Trainer(max_epochs=train_cfg.epochs,
                          callbacks=[checkpoint_callback,early_stop_callback],
                          precision=train_cfg.precision , 
@@ -105,4 +116,3 @@ def start_training(cfg: DictConfig):
         trainer.fit(model, train_dataloader,validation_dataloader, myckpt_path)
     else:
         trainer.fit(model, train_dataloader,validation_dataloader)
-
