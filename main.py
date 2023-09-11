@@ -23,8 +23,7 @@ def main(cfg: DictConfig):
                     
                     )
 
-        dataset = BaseDataset(**cfg.dataset)
-        Check_data.check_dataset(dataset)
+        start_training(cfg)
 
     elif user_input == '2':
         inference(cfg)
