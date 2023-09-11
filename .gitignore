@@ -7,5 +7,5 @@ __pycache__/
 dataset/
 .DS_Store
 results/
-
+outputs/
 model/checkpoints/*.ckpt
