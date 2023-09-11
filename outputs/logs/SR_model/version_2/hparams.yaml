@@ -1,0 +1,35 @@
+model_name: SR_model
+automatic_optimization: true
+image_channels: 1
+output_channels: 1
+c_factor: 6
+ch_mults: 5
+n_blocks: 1
+n_layers: 1
+scale_factor: 2
+kernel_size: 3
+n_groups: 32
+verbose: true
+Optimizer:
+  lr: 0.0001
+  optimizer: adamw
+  maximize: false
+  betas:
+  - 0.9
+  - 0.98
+  eps: 1.0e-06
+  weight_decay: 0.001
+  momentum: 0.9
+  Scheduler:
+    type: plateau
+    mode: min
+    factor: 0.1
+    threshold: 0.0001
+    min_lr: 1.0e-10
+    patience: 8
+    cooldown: 0
+    monitor: val_loss
+loss_func:
+  name: MSELoss
+  args:
+    reduction: sum
