@@ -36,6 +36,7 @@ def init_model(cfg:DictConfig):
 
 def setup_dataloaders(cfg:DictConfig):
     dataset = BaseDataset(**cfg.dataset)
+
     split_ratios = cfg.split_ratios
     train_ratio = split_ratios.train
     val_ratio = split_ratios.val 
@@ -45,7 +46,12 @@ def setup_dataloaders(cfg:DictConfig):
     train_size = int(dataset_size * train_ratio)
     val_size = int(dataset_size * val_ratio)
     test_size = dataset_size - train_size - val_size
-
+    '''
+    print(f"Dataset size: {dataset_size}")
+    print(f"Train size: {train_size}")
+    print(f"Validation size: {val_size}")
+    print(f"Test size: {test_size}")
+    '''
     train_dataset,validation_dataset,test_dataset = random_split(dataset,[train_size,val_size,test_size])
 
     train_dataloader = DataLoader(train_dataset, batch_size = cfg.train.batch_size, shuffle = True,collate_fn= custom_collate,pin_memory=True)

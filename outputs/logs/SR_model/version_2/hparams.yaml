@@ -3,7 +3,7 @@ automatic_optimization: true
 image_channels: 1
 output_channels: 1
 c_factor: 6
-ch_mults: 5
+ch_mults: 6
 n_blocks: 1
 n_layers: 1
 scale_factor: 2
@@ -12,7 +12,7 @@ n_groups: 32
 verbose: true
 Optimizer:
   lr: 0.0001
-  optimizer: adamw
+  optimizer: adam
   maximize: false
   betas:
   - 0.9

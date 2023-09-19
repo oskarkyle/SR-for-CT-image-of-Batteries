@@ -1,9 +1,9 @@
 from train import *
 from pred import *
-from interpolation import *
 from omegaconf import DictConfig, OmegaConf
 from torchsummary import summary
 from utilities import *
+import hydra
 
 @hydra.main(version_base=None, config_path="./configs", config_name="config")
 def main(cfg: DictConfig):
@@ -11,6 +11,8 @@ def main(cfg: DictConfig):
     print("Press 1 to train SR model")
     print("Press 2 to predict from SR model")
     print("Press 3 to calculate average PSNR in test set")
+    print("Press 4 to plot loss in epoch")
+    print("Press 5 to plot dataset for thesis")
 
     user_input = input()
     if user_input == '1':
@@ -31,6 +33,11 @@ def main(cfg: DictConfig):
     elif user_input == '3':
         calc_average_psnr_in_testset(cfg)
     #start_interpolate(cfg)
+    elif user_input == '4':
+        plot_loss_in_epoch(cfg)
+
+    elif user_input == '5':
+        plot_dataset_thesis(cfg)
 
 if __name__ == "__main__":
     main()

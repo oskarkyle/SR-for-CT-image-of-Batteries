@@ -1,4 +1,5 @@
 import torch
+from image_utils.utils import *
 
 class Tile():
     def __init__(self,sequence_number,pic_identifier,tile,h_tiles,w_tiles,tile_size):

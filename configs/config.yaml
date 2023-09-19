@@ -23,7 +23,7 @@ dataset:
   task: SR
   mode: train
   data_root: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries
-  dataset_dir: [/dataset/pristine]
+  dataset_dir: [/dataset/pristine, /dataset/cycled]
   tile_size: 512
   tile_grid: 4
 
@@ -33,7 +33,7 @@ dataset:
       binning_factor: 8
     
   transforms_cfg:
-    propability: 0.9
+    propability: 1.0
     RandomAffine:
       p: 0.75
       degrees: 20
@@ -51,19 +51,19 @@ dataset:
     RandomVerticalFlip:
       p: 0.5
     RandomBrightness:
-      p: 0.5
+      p: 0.75
       brightness:
-        - 0.9
+        - 1.1
         - 1.1
     RandomContrast:
       p: 0.75
       contrast:
-        - 0.9
+        - 1.1
         - 1.1
     RandomSaturation:
       p: 0.5
       saturation:
-        - 0.9
+        - 1.1
         - 1.1
     RandomHue:
       p: 0.5
@@ -73,7 +73,7 @@ dataset:
     #RandomMedianBlur:
     #  p: 1.0
     RandomGaussianNoise:
-      p: 0.75
+      p: 0.5
       mean: 0.1
       std: 0.5
     RandomGaussianBlur:
@@ -82,7 +82,7 @@ dataset:
         - 3
       sigma_range:
         - 0.1
-        - 1.0
+        - 1.1
 
 model:
   model_name: SR_model
@@ -124,8 +124,16 @@ model:
       reduction: sum
 
 pred:
-  ckpt_path: /model/checkpoints/xxx.ckpt
+  ckpt_path: /model/checkpoints/model_ch_mults_6_n_blocks_1_n_layers_1_epochs_10_sum.ckpt
   device: mps
   output_dir: /results/
-  output_name: SR
-  slice: 2
+  output_name: SR_moded_ch_6_gaussian_blur_XTM
+  slice: 1
+  tiff_file_index: 1
+  kernel_size: 5
+  train_loss_csv: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries/outputs/csv/SR_model_4_train.csv
+  val_loss_csv: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries/ouputs/csv/SR_model_4_val.csv
+  loss_curve_name: SR_Model_4
+  want_range: 4
+  input_thesis: input_thesis
+  label_thesis: label_thesis

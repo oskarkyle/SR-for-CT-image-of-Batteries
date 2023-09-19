@@ -1,12 +1,5 @@
-import hydra
 from omegaconf import DictConfig
-from torch.utils.data import DataLoader
-import lightning as L
-from lightning import Trainer
-from torch.utils.data.dataloader import default_collate
-from torch.utils.data import Subset
-from PIL import Image
-import kornia
+import csv
 
 from source.BaseDataset import *
 from utilities import *
@@ -14,6 +7,27 @@ from model.unet.ConvUNet import *
 from train import *
 from image_utils.utils import *
 from preprocess.Preprocessor import *
+
+def test_slice(cfg: DictConfig):
+    file_list = BaseDataset.load_file_paths_from_dir(cfg.dataset.data_root, cfg.dataset.dataset_dir)
+    tiff_file = file_list[cfg.pred.tiff_file_index - 1]
+    with tifffile.TiffFile(tiff_file) as tif:
+        test_slice = tif.pages[cfg.pred.slice - 1]
+        test_slice = test_slice.asarray()
+        test_slice_tensor = torch.from_numpy(test_slice)
+        test_slice_tensor = test_slice_tensor.unsqueeze(0)
+        label = test_slice_tensor
+        kernel_size = (cfg.pred.kernel_size, cfg.pred.kernel_size)
+
+        data, label = BaseDataset.get_preprocessor(cfg.dataset.preprocess_cfg)(test_slice_tensor, label)
+        
+        #data, label = BaseDataset.get_transforms(cfg.dataset.transforms_cfg)(data, label)
+
+        data = convert_tensor_to_numpy(data)
+        data = cv2.GaussianBlur(data, kernel_size, 0)
+        data = torch.from_numpy(data)
+
+        return data, label
 
 def setup_test_set(cfg: DictConfig):
     tiff_dataset = TiffDataset(cfg.dataset)
@@ -104,7 +118,8 @@ def inference(cfg: DictConfig):
     model = load_model(cfg)
     model.eval()
     
-    input, label = setup_input_label(cfg)
+    #input, label = setup_input_label(cfg)
+    input, label = test_slice(cfg)
     input_resize = Preprocessor.resize(input, (cfg.dataset.tile_size, cfg.dataset.tile_size))
 
     inputs = splitting(input, cfg)
@@ -158,4 +173,105 @@ def calc_average_psnr_in_testset(cfg:DictConfig):
     average_psnr(average_psnr_list)
 
 
+
+def convert_iter_to_epoch(data: list, epoch_size: int):
+    chunk_size = len(data) // epoch_size
+    averages = []
+
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i:i + chunk_size]  
+        avg = sum(chunk) / len(chunk)  
+        averages.append(avg)
+    
+    return averages
+
+def get_train_loss_val_loss(cfg: DictConfig):
+    # Replace 'your_file.csv' with the actual path to your CSV file
+    train_csv_file_path = cfg.pred.train_loss_csv
+    val_csv_file_path = cfg.pred.val_loss_csv
+    # Load the CSV data
+    train_loss_values = []
+    iter = []
+    val_loss_values = []
+    val_iter = []
+    try:
+        with open(train_csv_file_path, 'r') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)
+            for row in csv_reader:
+                train_loss_values.append(float(row[2]))
+                iter.append(int(row[1]))
+        
+
+    except FileNotFoundError:
+        print(f"The file '{train_csv_file_path}' does not exist.")
+        exit()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        exit()
+
+    try:
+        with open(val_csv_file_path, 'r') as file:
+            csv_reader = csv.reader(file)
+            next(csv_reader)
+            for row in csv_reader:
+                val_loss_values.append(float(row[2]))
+                val_iter.append(int(row[1]))
+            
+
+    except FileNotFoundError:
+        print(f"The file '{val_csv_file_path}' does not exist.")
+        exit()
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        exit()
+
+    return train_loss_values, iter, val_loss_values, val_iter
+
+def plot_loss_in_iter(cfg: DictConfig):
+    train_loss_values, iter, val_loss_values, val_iter = get_train_loss_val_loss(cfg)
+
+    plt.plot(iter, train_loss_values, label='Train Loss Curve', color='blue')
+    plt.plot(val_iter, val_loss_values, label='Validation Loss Curve', color='red')
+    plt.xlabel('Iteration')
+    plt.ylabel('Loss')
+
+    plt.legend()
+    plt.savefig(os.getcwd() + cfg.pred.output_dir + cfg.pred.loss_curve_name + '.png')
+
+
+def plot_loss_in_epoch(cfg: DictConfig):
+    epoch_size = cfg.train.epochs
+    train_loss_values, iter, val_loss_values, val_iter = get_train_loss_val_loss(cfg)
+
+    train_loss_values = convert_iter_to_epoch(train_loss_values, epoch_size)
+    val_loss_values = convert_iter_to_epoch(val_loss_values, epoch_size)
+    
+    plt.plot(range(1, epoch_size + 1), train_loss_values, color='blue', label='Train Loss Curve')
+    plt.plot(range(1, epoch_size + 1), val_loss_values, color='red', label='Validation Loss Curve')
+
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss')
+    plt.legend()
+    plt.savefig(os.getcwd() + cfg.pred.output_dir + cfg.pred.loss_curve_name + '.png')
+
+def plot_dataset_thesis(cfg: DictConfig):
+    input, label = setup_input_label(cfg)
+    inputs = splitting(input, cfg)
+    labels = splitting(label, cfg)
+
+    inputs_thesis = []
+    labels_thesis = []
+
+    for i in range(cfg.pred.want_range):
+        input = inputs[i].unsqueeze(0)
+        label = labels[i].unsqueeze(0)
+        inputs_thesis.append(input)
+        labels_thesis.append(label)
+
+    input_title = [f"LR_{i + 1}" for i in range(cfg.pred.want_range)]
+    label_title = [f"HR_{i + 1}" for i in range(cfg.pred.want_range)]
+
+    save_image(inputs_thesis, os.getcwd() + cfg.pred.output_dir + cfg.pred.input_thesis + '.png', input_title, axis=False)
+    save_image(labels_thesis, os.getcwd() + cfg.pred.output_dir + cfg.pred.label_thesis + '.png', label_title, axis=False)
 

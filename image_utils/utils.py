@@ -83,10 +83,8 @@ def convert_tensor_to_numpy(tensor):
 
     return numpy_array
 
-
 def calc_psnr(img1, img2):
     return 10. * torch.log10(1. / torch.mean((img1 - img2) ** 2))
-
 
 class AverageMeter(object):
     def __init__(self):
