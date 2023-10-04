@@ -44,6 +44,8 @@ class BaseDataset(DS):
             data_root (str, optional): The root directory of the dataset. Defaults to "".
             transforms_cfg (DictConfig, optional): The configuration for the data transforms. Defaults to None.
             preprocess_cfg (DictConfig, optional): The configuration for the data pre-processing. Defaults to None.
+            tile_size (int): The size of the tiles to extract from the images.
+            tile_grid (int): The tile number in each row and column.
 
         Raises:
             ValueError: If no dataset directory is given.
@@ -85,11 +87,31 @@ class BaseDataset(DS):
             self.tiff_intersection_border.append(self.tiff_intersection_border[-1] + tiles_count_in_current_tiff)
 
     def get_pages_count_in_tile(self, tiff_file):
+        """
+        To get the total number of pages in a tif file
+
+        Parameter:
+            tiff_file (str): the path of the tif file
+
+        Return:
+            num_pages: the total number of pages in the tif file
+        """
+
         with tifffile.TiffFile(tiff_file) as handle:
             num_pages = len(handle.pages)
         return num_pages
 
     def get_tiles_count_in_each_tiff(self, tiff_file):
+        """
+        To get the total number of tiles in a tif file
+
+        Parameter:
+            tiff_file (str): the path of the tif file
+
+        Return: 
+            tiles_count_in_each_tiff: the total number of tiles in the tif file
+        """
+
         tile_size = self.tile_size
         pages_count_in_tiff = self.get_pages_count_in_tile(tiff_file)
 
@@ -103,6 +125,16 @@ class BaseDataset(DS):
         return tiles_count_in_each_tiff
     
     def get_tiling_grid_in_each_tiff(self, tiff_file):
+        """
+        To get the tiling grid information in each tif file
+
+        Parameter:
+            tiff_file (str): the path of the tif file
+        
+        Return:
+            tiling_grid_info (tuple[int, int]): the tiling grid information in each tif file
+        """
+
         tile_size = self.tile_size
         
         with tifffile.TiffFile(tiff_file) as handle:
@@ -112,6 +144,20 @@ class BaseDataset(DS):
         return tiling_grid_info   
 
     def get_item_position(self, idx):
+        """
+        To get each tile's information including, which tif file it belongs to, which page it belongs to, which tile in the page it is,
+        and the tiling grid information.
+
+        Parameter:
+            idx : the index of the tile in the dataset
+        
+        Return:
+            tifffile_index: the index of the tif file in the dataset
+            page_index: the index of the page in the tif file
+            sequence_number_of_tile_in_page: the sequence number of the tile in the page
+            tiling_grid_info (tuple[int, int]): the tiling grid information
+
+        """
         left = 0
         right = len(self.file_list) - 1
         tifffile_index = -1
@@ -139,6 +185,16 @@ class BaseDataset(DS):
 
     
     def get_tile_from_index(self, index):
+        """
+        To get tile from the dataset by the index of the tile
+
+        Parameter:
+            index (int): the index of the tile in the dataset
+
+        Return:
+            tile (tensor): the tile in the dataset
+        """
+
         tifffile_index,page_index,sequence_number_of_tile_in_page,tiling_grid_info = self.get_item_position(index)
 
         tiff_file = self.file_list[tifffile_index]
@@ -227,6 +283,9 @@ class BaseDataset(DS):
     
 
     def check_dataset_constrains(self):
+        """
+        To check whether the dataset meets the constrains
+        """
         logger.warning("No dataset constrains for this Dataset! Please Check!")
 
     def __len__(self):

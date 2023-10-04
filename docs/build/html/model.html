@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Model &#8212; SR for CT images of Batteries with Deep Learning 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=2709fde1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Train" href="train.html" />
+    <link rel="prev" title="Data" href="data.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="model">
+<h1>Model<a class="headerlink" href="#model" title="Link to this heading">¶</a></h1>
+<p>This module contains the implementation of the U-Net model.</p>
+<section id="convblock">
+<h2>ConvBlock<a class="headerlink" href="#convblock" title="Link to this heading">¶</a></h2>
+<p>In this subsection, class <code class="docutils literal notranslate"><span class="pre">ConvBlock</span></code> is a building block of the U-Net model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.unet.blocks.ConvBlock">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.unet.blocks.</span></span><span class="sig-name descname"><span class="pre">ConvBlock</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.ConvBlock" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>A block of convolutional layers followed by max pooling, group normalization and activation function.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>in_channels (int): Number of input channels.
+out_channels (int): Number of output channels.
+n_layers (int): Number of convolutional layers.
+scale_factor (int): Factor by which to downsample the input.
+kernel_size (int): Size of the convolutional kernel.
+n_groups (int): Number of groups to use for group normalization.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The output tensor.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.blocks.ConvBlock.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.ConvBlock.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Output tensor of the convolutional block.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="skipconnection">
+<h2>SkipConnection<a class="headerlink" href="#skipconnection" title="Link to this heading">¶</a></h2>
+<p>In this subsection, class <code class="docutils literal notranslate"><span class="pre">SkipConnection</span></code> builds a skip connection in the U-Net model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.unet.blocks.SkipConnection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.unet.blocks.</span></span><span class="sig-name descname"><span class="pre">SkipConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.SkipConnection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>A block that performs a skip connection by max pooling the input tensor and applying group normalization and activation
+function to it.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>channels (int): Number of input channels.
+scale_factor (int): Factor by which to downsample the input.
+n_groups (int): Number of groups to use for group normalization.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple[torch.Tensor, torch.Tensor]: A tuple containing the output tensor and the intermediate tensor.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.blocks.SkipConnection.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.SkipConnection.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Skip connection forward pass. Returns a tuple containing the output tensor and the intermediate tensor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="combineconnection">
+<h2>CombineConnection<a class="headerlink" href="#combineconnection" title="Link to this heading">¶</a></h2>
+<p>In this subsection, class <code class="docutils literal notranslate"><span class="pre">CombineConnection</span></code> combines skip connection in the U-Net model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.unet.blocks.CombineConnection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.unet.blocks.</span></span><span class="sig-name descname"><span class="pre">CombineConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">channels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.CombineConnection" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Module</span></code></p>
+<p>A block that combines the skip connection and residual block by performing a residual connection between the input tensor and
+the output of the residual block.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>in_channels (int): Number of input channels.
+out_channels (int): Number of output channels.
+scale_factor (int): Factor by which to upsample the input.
+n_groups (int): Number of groups to use for group normalization.
+dropout (float): Dropout probability.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The output tensor.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.blocks.CombineConnection.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_e</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.blocks.CombineConnection.forward" title="Link to this definition">¶</a></dt>
+<dd><p>Combine connection forward pass. Element wise addition of two same spatial dimension tensor.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="convunet">
+<h2>ConvUNet<a class="headerlink" href="#convunet" title="Link to this heading">¶</a></h2>
+<p>In this subsection, class <code class="docutils literal notranslate"><span class="pre">ConvUNet</span></code> builds a U-Net model.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">model.unet.ConvUNet.</span></span><span class="sig-name descname"><span class="pre">ConvUNet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_channels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ch_mults</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_blocks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">LightningModule</span></code></p>
+<p>A simple Conv U-Net.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model_cfg (DictConfig): The configuration dictionary for the model.        
+image_channels (int): The number of channels in the input image.      
+output_channels (int): The number of channels in the output image.       
+c_factor (int, optional): The channel factor. Defaults to 6.       
+ch_mults (Union[Tuple[int, …], List[int]], optional): The channel multipliers. Defaults to (1, 2, 3, 4).      
+n_blocks (int, optional): The number of blocks. Defaults to 2.      
+n_layers (int, optional): The number of layers. Defaults to 2.        
+scale_factor (int, optional): The scale factor. Defaults to 2.        
+kernel_size (int, optional): The kernel size. Defaults to 3.      
+n_groups (int, optional): The number of groups in GroupNorm. Defaults to 32.    
+verbose (bool, optional): Whether to print verbose logs. Defaults to True.</p>
+</dd>
+<dt>Attributes:</dt><dd><p>image_proj (nn.Conv2d): The image projection layer.       
+down (nn.ModuleList): The down-sampling layers.        
+middle (ConvBlock): The middle layer.       
+up (nn.ModuleList): The up-sampling layers.       
+norm (nn.GroupNorm): The group normalization layer.      
+act (Swish): The activation function.      
+final (nn.Conv2d): The final convolutional layer.   
+sig (nn.Sigmoid): The sigmoid activation function.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.configure_optimizers">
+<span class="sig-name descname"><span class="pre">configure_optimizers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Optimizer</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Optimizer</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Scheduler</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">Scheduler</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.configure_optimizers" title="Link to this definition">¶</a></dt>
+<dd><p>Configure the optimizer and learning rate scheduler for the Lightning module.</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>A tuple containing one or two elements, depending on whether a learning rate scheduler is used or not.
+The first element is an optimizer or a list of optimizers.
+The second element is a learning rate scheduler or a list of learning rate schedulers.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.forward" title="Link to this definition">¶</a></dt>
+<dd><p>The forward method of the ConvUNet class defines the forward pass of the convolutional U-Net model. It takes an input tensor x and passes it through the layers of the model to produce an output tensor.</p>
+<p>The method starts by passing the input tensor through the image projection layer. It then performs downsampling using skip and residual connections, saving the output tensor from each skip connection in a list h for later combination.</p>
+<p>After the downsampling layers, the method passes the output tensor through the middle layer of the model. It then performs upsampling using the saved skip connection tensors and residual connections, combining them with the output tensor from each upsampling layer.</p>
+<p>Finally, the method passes the output tensor through the final layer of the model, applies an activation function, and returns the resulting tensor.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.get_loss">
+<span class="sig-name descname"><span class="pre">get_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_hat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.get_loss" title="Link to this definition">¶</a></dt>
+<dd><p>To get the loss from the loss function</p>
+<dl class="simple">
+<dt>Returns:</dt><dd><p>torch.Tensor: The loss for the current step.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.predict_step">
+<span class="sig-name descname"><span class="pre">predict_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataloader_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.predict_step" title="Link to this definition">¶</a></dt>
+<dd><p>Prediction for the lightning module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>batch (torch.Tensor): The input batch.
+batch_idx (int): The index of the batch.
+dataloader_idx (int): The index of the dataloader.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The prediction of current batch.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.restore">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">restore</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ckpt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">map_location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">device</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'mps'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.restore" title="Link to this definition">¶</a></dt>
+<dd><p>Restores a PyTorch Lightning model from a checkpoint file.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cls (LightningModule): The class of the PyTorch Lightning model to restore.
+ckpt (str): The path to the checkpoint file to restore from.
+map_location (Union[torch.device, str, int]): Device to map the restored model to.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple[LightningModule, DictConfig]: A tuple of the restored model and its configuration.</p>
+</dd>
+<dt>Raises:</dt><dd><p>RuntimeError: If the checkpoint file does not contain hyperparameters.</p>
+</dd>
+<dt>Example:</dt><dd><p># Restore a PLModel from a checkpoint file
+model, config = PLModel.restore(ckpt=’path/to/checkpoint.ckpt’)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.save_model">
+<span class="sig-name descname"><span class="pre">save_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.save_model" title="Link to this definition">¶</a></dt>
+<dd><p>Save a PyTorch model to a given directory.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>model (torch.nn.Module): The PyTorch model to save.
+save_dir (str): The directory to save the model to.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.test_model">
+<span class="sig-name descname"><span class="pre">test_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.test_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.training_step">
+<span class="sig-name descname"><span class="pre">training_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.training_step" title="Link to this definition">¶</a></dt>
+<dd><p>Training step for the lightning module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>batch (torch.Tensor): The input batch.
+batch_idx (int): The index of the batch.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The loss for the current training step.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="model.unet.ConvUNet.ConvUNet.validation_step">
+<span class="sig-name descname"><span class="pre">validation_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#model.unet.ConvUNet.ConvUNet.validation_step" title="Link to this definition">¶</a></dt>
+<dd><p>Validation step for the lightning module.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>batch (torch.Tensor): The input batch.
+batch_idx (int): The index of the batch.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: The loss for the current validation step.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SR for CT images of Batteries with Deep Learning</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Model</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#convblock">ConvBlock</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#skipconnection">SkipConnection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combineconnection">CombineConnection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convunet">ConvUNet</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="train.html">Train</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pred.html">Prediction</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="data.html" title="previous chapter">Data</a></li>
+      <li>Next: <a href="train.html" title="next chapter">Train</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Haorui Long.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/model.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

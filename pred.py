@@ -8,7 +8,20 @@ from train import *
 from image_utils.utils import *
 from preprocess.Preprocessor import *
 
+
 def test_slice(cfg: DictConfig):
+    """
+    To get specific slice from test set. And applying it with preprocessing and transforms
+    in order to get the input and label.
+
+    Parameters:
+        cfg: DictConfig
+
+    Returns:
+        data: torch.Tensor
+        label: torch.Tensor
+    """
+
     file_list = BaseDataset.load_file_paths_from_dir(cfg.dataset.data_root, cfg.dataset.dataset_dir)
     tiff_file = file_list[cfg.pred.tiff_file_index - 1]
     with tifffile.TiffFile(tiff_file) as tif:
@@ -30,16 +43,40 @@ def test_slice(cfg: DictConfig):
         return data, label
 
 def setup_test_set(cfg: DictConfig):
+    """
+    To get the test set from the dataset. Using dataset splitting ratio.
+
+    Returns:
+        test_set: torch.utils.data.Dataset
+    """
     tiff_dataset = TiffDataset(cfg.dataset)
     train_set, val_set, test_set = split_dataset(cfg, tiff_dataset)
     return test_set
 
 def setup_input_label(cfg: DictConfig):
+    """
+    To set up the input and label from the test set for thesis used.
+
+    Returns:
+        input: torch.Tensor
+        label: torch.Tensor
+    """
     test_set = setup_test_set(cfg)
     input, label = test_set.__getitem__(cfg.pred.slice - 1)
     return input, label
 
 def splitting(image: torch.Tensor, cfg: DictConfig):
+    """
+    To split image into specific size of tiles.
+
+    Parameters:
+        image: torch.Tensor
+        cfg: DictConfig
+
+    Returns:
+        tiles: list
+    """
+
     image = convert_tensor_to_numpy(image)
 
     # Get the dimensions of the image
@@ -79,6 +116,12 @@ def splitting(image: torch.Tensor, cfg: DictConfig):
     return tiles
 
 def load_model(cfg: DictConfig):
+    """
+    Load model from checkpoint. 
+
+    Returns:
+        model: ConvUNet
+    """
     path = cfg.dataset.data_root
     os.chdir(path)
     myckpt_path = os.getcwd() + cfg.pred.ckpt_path
@@ -90,12 +133,28 @@ def load_model(cfg: DictConfig):
 
 
 def prediction(model, tile):
+    """
+    Predicting image from trained model.
+
+    Returns:
+        output: torch.Tensor
+    """
     device = torch.device("cuda" if torch.cuda.is_available() else "mps")
     input = tile.to(device)
     output = model(input)
     return output
 
 def reassemble(tiles: list, cfg:DictConfig):
+    """
+    To reassemble the tiles into a image, which is one of the slice in the test set.
+
+    Parameters: 
+        tiles: list
+        cfg: DictConfig
+
+    Returns:
+        reassembled_image: torch.Tensor
+    """
     reassembled_image = np.zeros((cfg.dataset.tile_size * cfg.dataset.tile_grid, cfg.dataset.tile_size * cfg.dataset.tile_grid), dtype=tiles[0].dtype)
     num_col = cfg.dataset.tile_grid
     num_row = cfg.dataset.tile_grid
@@ -115,6 +174,10 @@ def reassemble(tiles: list, cfg:DictConfig):
 
 
 def inference(cfg: DictConfig):
+    """
+    Start inference.
+    """
+
     model = load_model(cfg)
     model.eval()
     
@@ -146,6 +209,13 @@ def inference(cfg: DictConfig):
 
 
 def calc_average_psnr_in_testset(cfg:DictConfig):
+    """
+    To calculate the average PSNR in the test set.
+
+    Returns:
+        average_psnr: float
+    
+    """
     testset = setup_test_set(cfg)
     model = load_model(cfg)
     model.eval()
@@ -167,7 +237,7 @@ def calc_average_psnr_in_testset(cfg:DictConfig):
             psnr_list.append(psnr)
 
         slice_psnr = sum(psnr_list) / len(psnr_list)
-        print(f"第{i+1}张的PSNR: {slice_psnr}")
+        print(f"{i+1} tile's PSNR: {slice_psnr}")
         average_psnr_list.append(slice_psnr)
     
     average_psnr(average_psnr_list)
@@ -175,6 +245,18 @@ def calc_average_psnr_in_testset(cfg:DictConfig):
 
 
 def convert_iter_to_epoch(data: list, epoch_size: int):
+    """
+    In loss curves, we want to show the loss in each epoch. 
+    But the loss in log is save in each iteration.
+    So we need to convert the loss in iteration to loss in epoch.
+
+    Parameters:
+        data: list
+        epoch_size: int
+
+    Returns:
+        averages: list
+    """
     chunk_size = len(data) // epoch_size
     averages = []
 
@@ -186,6 +268,16 @@ def convert_iter_to_epoch(data: list, epoch_size: int):
     return averages
 
 def get_train_loss_val_loss(cfg: DictConfig):
+    """
+    Load the train loss and validation loss from csv file.
+
+    Returns:
+        train_loss_values: list
+        iter: list
+        val_loss_values: list
+        val_iter: list
+    """
+
     # Replace 'your_file.csv' with the actual path to your CSV file
     train_csv_file_path = cfg.pred.train_loss_csv
     val_csv_file_path = cfg.pred.val_loss_csv
@@ -229,6 +321,10 @@ def get_train_loss_val_loss(cfg: DictConfig):
     return train_loss_values, iter, val_loss_values, val_iter
 
 def plot_loss_in_iter(cfg: DictConfig):
+    """
+    To plot the loss curve in iteration.
+    """
+
     train_loss_values, iter, val_loss_values, val_iter = get_train_loss_val_loss(cfg)
 
     plt.plot(iter, train_loss_values, label='Train Loss Curve', color='blue')
@@ -241,6 +337,9 @@ def plot_loss_in_iter(cfg: DictConfig):
 
 
 def plot_loss_in_epoch(cfg: DictConfig):
+    """
+    To plot the loss curve in epoch.
+    """
     epoch_size = cfg.train.epochs
     train_loss_values, iter, val_loss_values, val_iter = get_train_loss_val_loss(cfg)
 
@@ -255,23 +354,4 @@ def plot_loss_in_epoch(cfg: DictConfig):
     plt.legend()
     plt.savefig(os.getcwd() + cfg.pred.output_dir + cfg.pred.loss_curve_name + '.png')
 
-def plot_dataset_thesis(cfg: DictConfig):
-    input, label = setup_input_label(cfg)
-    inputs = splitting(input, cfg)
-    labels = splitting(label, cfg)
-
-    inputs_thesis = []
-    labels_thesis = []
-
-    for i in range(cfg.pred.want_range):
-        input = inputs[i].unsqueeze(0)
-        label = labels[i].unsqueeze(0)
-        inputs_thesis.append(input)
-        labels_thesis.append(label)
-
-    input_title = [f"LR_{i + 1}" for i in range(cfg.pred.want_range)]
-    label_title = [f"HR_{i + 1}" for i in range(cfg.pred.want_range)]
-
-    save_image(inputs_thesis, os.getcwd() + cfg.pred.output_dir + cfg.pred.input_thesis + '.png', input_title, axis=False)
-    save_image(labels_thesis, os.getcwd() + cfg.pred.output_dir + cfg.pred.label_thesis + '.png', label_title, axis=False)
 

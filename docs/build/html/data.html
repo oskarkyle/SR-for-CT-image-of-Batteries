@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Data &#8212; SR for CT images of Batteries with Deep Learning 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b3523f8e" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=2709fde1"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Model" href="model.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="data">
+<h1>Data<a class="headerlink" href="#data" title="Link to this heading">¶</a></h1>
+<section id="download">
+<h2>Download<a class="headerlink" href="#download" title="Link to this heading">¶</a></h2>
+<p>The data can be downloaded from the following link:
+&lt;<a class="reference external" href="https://www.research-collection.ethz.ch/handle/20.500.11850/505938">https://www.research-collection.ethz.ch/handle/20.500.11850/505938</a>&gt;.
+And the data is unzipped in the folder ‘dataset/’.
+If there is no such folder, please create one and unzip the data in it.</p>
+<p>Create the folder:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mkdir<span class="w"> </span>dataset
+</pre></div>
+</div>
+</section>
+<section id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Link to this heading">¶</a></h2>
+<p>To get the dataset for model,
+you can use the <code class="docutils literal notranslate"><span class="pre">BaseDataset</span></code> class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">source.BaseDataset.</span></span><span class="sig-name descname"><span class="pre">BaseDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tile_grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transforms_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.check_dataset_constrains">
+<span class="sig-name descname"><span class="pre">check_dataset_constrains</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.check_dataset_constrains" title="Link to this definition">¶</a></dt>
+<dd><p>To check whether the dataset meets the constrains</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_item_position">
+<span class="sig-name descname"><span class="pre">get_item_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">idx</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_item_position" title="Link to this definition">¶</a></dt>
+<dd><p>To get each tile’s information including, which tif file it belongs to, which page it belongs to, which tile in the page it is,
+and the tiling grid information.</p>
+<dl class="simple">
+<dt>Parameter:</dt><dd><p>idx : the index of the tile in the dataset</p>
+</dd>
+<dt>Return:</dt><dd><p>tifffile_index: the index of the tif file in the dataset
+page_index: the index of the page in the tif file
+sequence_number_of_tile_in_page: the sequence number of the tile in the page
+tiling_grid_info (tuple[int, int]): the tiling grid information</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_pages_count_in_tile">
+<span class="sig-name descname"><span class="pre">get_pages_count_in_tile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiff_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_pages_count_in_tile" title="Link to this definition">¶</a></dt>
+<dd><p>To get the total number of pages in a tif file</p>
+<dl class="simple">
+<dt>Parameter:</dt><dd><p>tiff_file (str): the path of the tif file</p>
+</dd>
+<dt>Return:</dt><dd><p>num_pages: the total number of pages in the tif file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_preprocessor">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocess_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#preprocess.Preprocessor.Preprocessor" title="preprocess.Preprocessor.Preprocessor"><span class="pre">Preprocessor</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_preprocessor" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Preprocessor object based on the provided preprocessing configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>preprocess_cfg (DictConfig): A configuration object that specifies the details of the preprocessing pipeline.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Preprocessor: A Preprocessor object that can be used to preprocess the data.</p>
+</dd>
+<dt>Notes:</dt><dd><p>This method creates a Preprocessor object based on the provided configuration.
+If no configuration is provided (i.e., if preprocess_cfg is None), None is returned.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_tile_from_index">
+<span class="sig-name descname"><span class="pre">get_tile_from_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_tile_from_index" title="Link to this definition">¶</a></dt>
+<dd><p>To get tile from the dataset by the index of the tile</p>
+<dl class="simple">
+<dt>Parameter:</dt><dd><p>index (int): the index of the tile in the dataset</p>
+</dd>
+<dt>Return:</dt><dd><p>tile (tensor): the tile in the dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_tiles_count_in_each_tiff">
+<span class="sig-name descname"><span class="pre">get_tiles_count_in_each_tiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiff_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_tiles_count_in_each_tiff" title="Link to this definition">¶</a></dt>
+<dd><p>To get the total number of tiles in a tif file</p>
+<dl class="simple">
+<dt>Parameter:</dt><dd><p>tiff_file (str): the path of the tif file</p>
+</dd>
+<dt>Return: </dt><dd><p>tiles_count_in_each_tiff: the total number of tiles in the tif file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_tiling_grid_in_each_tiff">
+<span class="sig-name descname"><span class="pre">get_tiling_grid_in_each_tiff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiff_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_tiling_grid_in_each_tiff" title="Link to this definition">¶</a></dt>
+<dd><p>To get the tiling grid information in each tif file</p>
+<dl class="simple">
+<dt>Parameter:</dt><dd><p>tiff_file (str): the path of the tif file</p>
+</dd>
+<dt>Return:</dt><dd><p>tiling_grid_info (tuple[int, int]): the tiling grid information in each tif file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.get_transforms">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_transforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transforms_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#transform.Transforms.Transforms" title="transform.Transforms.Transforms"><span class="pre">Transforms</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#source.BaseDataset.BaseDataset.get_transforms" title="Link to this definition">¶</a></dt>
+<dd><p>Returns a Transform object based on the provided configuration.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>transforms_cfg (DictConfig): The configuration for the transforms.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Transforms: The Transform object.</p>
+</dd>
+<dt>Notes:</dt><dd><p>This method creates a Transforms object based on the provided configuration.
+If no configuration is provided (i.e., if transforms_cfg is None), None is returned.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="source.BaseDataset.BaseDataset.load_file_paths_from_dir">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_file_paths_from_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_root</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#source.BaseDataset.BaseDataset.load_file_paths_from_dir" title="Link to this definition">¶</a></dt>
+<dd><p>Recursively loads all file paths from the given directory or directories.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data_root (str): The root directory to which the dataset directory paths are relative.
+dataset_dir (List[str]): A list of directory paths to load file paths from.
+recursive (bool, optional): Whether to recursively load file paths from all subdirectories. Defaults to True.</p>
+</dd>
+<dt>Returns:</dt><dd><p>List[Path]: A sorted list of all file paths found in the given directories.</p>
+</dd>
+<dt>Raises:</dt><dd><p>FileNotFoundError: If any of the given directories are not found.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">¶</a></h2>
+<p>To get the preprocess for dataset,
+you can use the <code class="docutils literal notranslate"><span class="pre">Preprocessor</span></code> class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">preprocess.Preprocessor.</span></span><span class="sig-name descname"><span class="pre">Preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">preprocess_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.binning">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">binning</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">binning_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.binning" title="Link to this definition">¶</a></dt>
+<dd><p>To get binned image, we first downsample the image by a factor of binning_factor using average pooling, and then
+upsample it to the original size using nearest neighbor interpolation.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Input image tensor.
+binning_factor (int): Binning factor.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Binned image tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.convert_dtype">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">convert_dtype</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.convert_dtype" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the image tensor to the right dytpe.
+:param image:
+:return: image</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.gamma_correction">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">gamma_correction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.gamma_correction" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.normalize">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">normalize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.normalize" title="Link to this definition">¶</a></dt>
+<dd><p>Normalize the image tensor with given mean and standard deviation values.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.rescale">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rescale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.rescale" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>image</strong> – </p></li>
+<li><p><strong>min_val</strong> – </p></li>
+<li><p><strong>max_val</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>rescaled image</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.resize">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">resize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.resize" title="Link to this definition">¶</a></dt>
+<dd><p>Resize a torch.Tensor image to the specified size, while padding it with zeros to make it square, using Kornia library.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Input image tensor.
+size (list[int, int]): Desired output size.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Resized and padded image tensor.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="preprocess.Preprocessor.Preprocessor.to_grayscale">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">to_grayscale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tensor</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tensor</span></span></span><a class="headerlink" href="#preprocess.Preprocessor.Preprocessor.to_grayscale" title="Link to this definition">¶</a></dt>
+<dd><p>Convert the image tensor to grayscale.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="transform">
+<h2>Transform<a class="headerlink" href="#transform" title="Link to this heading">¶</a></h2>
+<p>To get the transform for dataset,
+you can use the <code class="docutils literal notranslate"><span class="pre">Transform</span></code> class.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">transform.Transforms.</span></span><span class="sig-name descname"><span class="pre">Transforms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transforms_cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Apply a set of custom transforms on the input image</p>
+<dl class="simple">
+<dt>Example:</dt><dd><p>transform_dict = {
+‘rotate’: {‘angle’: 30},
+‘adjust_brightness’: {‘brightness_factor’: 0.5}
+}</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomAffine">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomAffine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomAffine" title="Link to this definition">¶</a></dt>
+<dd><p>Rotate the given tensor image by angle.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>degrees (float or int): Rotation angle in degrees.
+etc.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Rotated tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomBrightness">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomBrightness</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomBrightness" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the brightness of the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be adjusted.
+brightness_factor (float): Brightness adjustment factor. Must be positive.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Brightness-adjusted tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomContrast">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomContrast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomContrast" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the contrast of the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be adjusted.
+contrast_factor (float): Contrast adjustment factor. Must be positive.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Contrast-adjusted tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomCrop">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomCrop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomCrop" title="Link to this definition">¶</a></dt>
+<dd><p>Crop the given tensor image at a random location.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be cropped.
+output_size (tuple): Expected output size (height, width) of the crop.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Cropped tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomGaussianBlur">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomGaussianBlur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomGaussianBlur" title="Link to this definition">¶</a></dt>
+<dd><p>Applies a random Gaussian blur to the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be blurred.
+kernel_size_range (tuple): Range of kernel sizes to randomly sample from.
+sigma_range (tuple): Range of sigma values to randomly sample from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Blurred tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomGaussianNoise">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomGaussianNoise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomGaussianNoise" title="Link to this definition">¶</a></dt>
+<dd><p>Adds random Gaussian noise to the given tensor image. If values are out of range, the tensor is clipped.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be noised.
+mean (float): Mean of the Gaussian noise distribution.
+std (float): Standard deviation of the Gaussian noise distribution.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Noised tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomHorizontalFlip">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomHorizontalFlip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomHorizontalFlip" title="Link to this definition">¶</a></dt>
+<dd><p>Horizontally flip the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be flipped.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Horizontally flipped tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomHue">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomHue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomHue" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the hue of the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be adjusted.
+hue_factor (float): Hue adjustment factor.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Hue-adjusted tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomMedianBlur">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomMedianBlur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomMedianBlur" title="Link to this definition">¶</a></dt>
+<dd><p>Applies a random median blur to the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be blurred.
+kernel_size_range (tuple): Range of kernel sizes to randomly sample from.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Blurred tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomSaturation">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomSaturation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomSaturation" title="Link to this definition">¶</a></dt>
+<dd><p>Adjust the saturation of the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be adjusted.
+saturation_factor (float): Saturation adjustment factor. Must be positive.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Saturation-adjusted tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="transform.Transforms.Transforms.RandomVerticalFlip">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RandomVerticalFlip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#transform.Transforms.Transforms.RandomVerticalFlip" title="Link to this definition">¶</a></dt>
+<dd><p>Vertically flip the given tensor image.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>image (torch.Tensor): Tensor image to be flipped.</p>
+</dd>
+<dt>Returns:</dt><dd><p>torch.Tensor: Vertically flipped tensor image.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">SR for CT images of Batteries with Deep Learning</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#download">Download</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#preprocessing">Preprocessing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#transform">Transform</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="train.html">Train</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pred.html">Prediction</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
+      <li>Next: <a href="model.html" title="next chapter">Model</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Haorui Long.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/data.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

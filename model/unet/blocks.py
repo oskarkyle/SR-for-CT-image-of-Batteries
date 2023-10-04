@@ -49,6 +49,9 @@ class ConvBlock(nn.Module):
         self.act = Swish()
 
     def forward(self, x: torch.Tensor):
+        """
+        Output tensor of the convolutional block.
+        """
         for conv in self.conv_layers:
             x = conv(x)
         x = self.pool(self.act(self.norm(x)))
@@ -130,6 +133,9 @@ class SkipConnection(nn.Module):
         self.act = Swish()
 
     def forward(self, x: torch.Tensor):
+        """
+        Skip connection forward pass. Returns a tuple containing the output tensor and the intermediate tensor.
+        """
         x_e = self.act(self.norm(x))
         x = self.pool(x_e)
         return x, x_e
@@ -159,6 +165,10 @@ class CombineConnection(nn.Module):
         self.act = Swish()
 
     def forward(self, x: torch.Tensor, x_e: torch.Tensor):
+        """
+        Combine connection forward pass. Element wise addition of two same spatial dimension tensor.
+        """
+
         x = self.act(self.norm(self.scale(x)))
         x = torch.add(x, x_e)
         return x

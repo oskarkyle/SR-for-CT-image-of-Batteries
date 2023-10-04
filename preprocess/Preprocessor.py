@@ -1,5 +1,4 @@
 from loguru import logger
-import random
 from typing import Dict, Any, Tuple, Optional
 from omegaconf import DictConfig, ListConfig
 import torch
@@ -7,8 +6,6 @@ import kornia
 import torchvision.transforms.functional as F
 import cv2
 import numpy as np
-import math
-from PIL import Image
 
 # https://kornia.readthedocs.io/en/latest/augmentation.html
 class Preprocessor:
@@ -160,6 +157,18 @@ class Preprocessor:
 
     @staticmethod
     def binning(image: torch.Tensor, binning_factor: int) -> torch.Tensor:
+        """
+        To get binned image, we first downsample the image by a factor of binning_factor using average pooling, and then
+        upsample it to the original size using nearest neighbor interpolation.
+
+        Args:
+            image (torch.Tensor): Input image tensor.
+            binning_factor (int): Binning factor.
+
+        Returns:
+            torch.Tensor: Binned image tensor.
+        """
+
         if binning_factor < 2:
             return image
 

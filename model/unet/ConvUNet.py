@@ -18,26 +18,26 @@ class ConvUNet(L.LightningModule):
     """A simple Conv U-Net.
 
     Args:
-        model_cfg (DictConfig): The configuration dictionary for the model.
-        image_channels (int): The number of channels in the input image.
-        output_channels (int): The number of channels in the output image.
-        c_factor (int, optional): The channel factor. Defaults to 6.
-        ch_mults (Union[Tuple[int, ...], List[int]], optional): The channel multipliers. Defaults to (1, 2, 3, 4).
-        n_blocks (int, optional): The number of blocks. Defaults to 2.
-        n_layers (int, optional): The number of layers. Defaults to 2.
-        scale_factor (int, optional): The scale factor. Defaults to 2.
-        kernel_size (int, optional): The kernel size. Defaults to 3.
-        n_groups (int, optional): The number of groups in GroupNorm. Defaults to 32.
+        model_cfg (DictConfig): The configuration dictionary for the model.        
+        image_channels (int): The number of channels in the input image.      
+        output_channels (int): The number of channels in the output image.       
+        c_factor (int, optional): The channel factor. Defaults to 6.       
+        ch_mults (Union[Tuple[int, ...], List[int]], optional): The channel multipliers. Defaults to (1, 2, 3, 4).      
+        n_blocks (int, optional): The number of blocks. Defaults to 2.      
+        n_layers (int, optional): The number of layers. Defaults to 2.        
+        scale_factor (int, optional): The scale factor. Defaults to 2.        
+        kernel_size (int, optional): The kernel size. Defaults to 3.      
+        n_groups (int, optional): The number of groups in GroupNorm. Defaults to 32.    
         verbose (bool, optional): Whether to print verbose logs. Defaults to True.
 
     Attributes:
-        image_proj (nn.Conv2d): The image projection layer.
-        down (nn.ModuleList): The down-sampling layers.
-        middle (ConvBlock): The middle layer.
-        up (nn.ModuleList): The up-sampling layers.
-        norm (nn.GroupNorm): The group normalization layer.
-        act (Swish): The activation function.
-        final (nn.Conv2d): The final convolutional layer.
+        image_proj (nn.Conv2d): The image projection layer.       
+        down (nn.ModuleList): The down-sampling layers.        
+        middle (ConvBlock): The middle layer.       
+        up (nn.ModuleList): The up-sampling layers.       
+        norm (nn.GroupNorm): The group normalization layer.      
+        act (Swish): The activation function.      
+        final (nn.Conv2d): The final convolutional layer.   
         sig (nn.Sigmoid): The sigmoid activation function.
 
     """
@@ -54,17 +54,26 @@ class ConvUNet(L.LightningModule):
                  n_groups: int = 32,
                  verbose: bool = True
                  ):
+        """
+        To construct the ConvUNet model with the given hyperparameters.
+        The Architecture of ConvUNet is built from basic blocks including ConvBlock, SkipConnection and CombineConnection.
+        """
         super(ConvUNet, self).__init__()
         self.verbose = verbose
         self.cfg = model_cfg
         # hyperparameter:
+        # Exponential factor over 2, for image projection
         self.c_factor = c_factor
+        # Exponential factor to be added onto c_factor
         if isinstance(ch_mults, int):
             self.ch_mults = [m+1 for m in range(ch_mults)]
         else:
             self.ch_mults = ch_mults
+        # ConvBlock manipulation in each combine or skip connection     
         self.n_blocks = n_blocks
+        # Conv2d layers in ConvBlock, 2 for direct output from input
         self.n_layers = n_layers
+        
         self.scale_factor = scale_factor
         self.kernel_size = kernel_size
         self.n_groups = n_groups
@@ -83,12 +92,17 @@ class ConvUNet(L.LightningModule):
             logger.opt(ansi=True).info(f"Number of Layers: <yellow>{self.n_layers}</>")
             logger.opt(ansi=True).info(f"Number of Groups in GroupNorm: <yellow>{self.n_groups}</>")
 
+        # Exponential factor over 2, for image projection 
         n_channels = 2 ** self.c_factor
+        # Times for multiplication
         n_resolutions = len(self.ch_mults)
+
+        # Projection block
+        # The assigned value is also the group numbers since it is dividable by all the rest blocks 
         self.image_proj = nn.Conv2d(image_channels, n_channels, kernel_size=(3, 3), padding=(1, 1)) # Change
-
+        # Starting the input channels from the projection 
         in_channels = n_channels
-
+        # Downsampling with skip and residual
         down = []
         for i in range(n_resolutions - 1):
             out_channels = 2 ** (self.c_factor + self.ch_mults[i])
@@ -102,10 +116,13 @@ class ConvUNet(L.LightningModule):
 
         self.down = nn.ModuleList(down)
 
+        # Apply an extra ConvBloak to reach maximum output channels, reset in_channels with maximum for later upsampling
+        # Size upsampling corresponds to channel downgrade and vice versa.
         out_channels = 2 ** (self.c_factor + self.ch_mults[-1])
         self.middle = ConvBlock(in_channels, out_channels, 1, 1, self.kernel_size, n_groups=in_channels) # TODO: check if n_group change is sinnvoll
         in_channels = out_channels
 
+        #  Upsampling with addition from residual
         up = []
         for i in reversed(range(n_resolutions)):
             out_channels = 2 ** (self.c_factor - 1 + self.ch_mults[i])
@@ -119,6 +136,7 @@ class ConvUNet(L.LightningModule):
 
         self.up = nn.ModuleList(up)
 
+        # Prepare the blocks for final output 
         self.norm = nn.GroupNorm(8, n_channels)
         self.act = Swish()
         self.final = nn.Conv2d(in_channels, output_channels, kernel_size=(3, 3), padding=(1, 1)) # Change
@@ -128,8 +146,19 @@ class ConvUNet(L.LightningModule):
         logger.success('Done: Create ConvUNet.')
 
     def forward(self, x: torch.Tensor):
-        x = self.image_proj(x)
+        """
+        The forward method of the ConvUNet class defines the forward pass of the convolutional U-Net model. It takes an input tensor x and passes it through the layers of the model to produce an output tensor.
 
+        The method starts by passing the input tensor through the image projection layer. It then performs downsampling using skip and residual connections, saving the output tensor from each skip connection in a list h for later combination.
+
+        After the downsampling layers, the method passes the output tensor through the middle layer of the model. It then performs upsampling using the saved skip connection tensors and residual connections, combining them with the output tensor from each upsampling layer.
+
+        Finally, the method passes the output tensor through the final layer of the model, applies an activation function, and returns the resulting tensor.
+        """
+
+        # Starting the input channels from the projection 
+        x = self.image_proj(x)
+        # Downsampling with skip and residual
         h = []
 
         for m in self.down:
@@ -139,9 +168,9 @@ class ConvUNet(L.LightningModule):
             else:
                 x = m(x)
 
-
+        # Middle layer
         x = self.middle(x)
-
+        # Upsampling with addition from residual
         for m in self.up:
             if isinstance(m, CombineConnection):
                 s = h.pop()
@@ -254,6 +283,16 @@ class ConvUNet(L.LightningModule):
         return [optimizer], [scheduler]
 
     def training_step(self, batch, batch_idx):
+        """
+        Training step for the lightning module.
+
+        Args:
+            batch (torch.Tensor): The input batch.
+            batch_idx (int): The index of the batch.
+
+        Returns:
+            torch.Tensor: The loss for the current training step.
+        """
         self.train()
         loss = self._training_step(batch, batch_idx)
         self.log('train_loss', loss, prog_bar=True) 
@@ -271,6 +310,17 @@ class ConvUNet(L.LightningModule):
         return loss
     
     def validation_step(self, batch, batch_idx):
+        """
+        Validation step for the lightning module.
+
+        Args:
+            batch (torch.Tensor): The input batch.
+            batch_idx (int): The index of the batch.
+
+        Returns:
+            torch.Tensor: The loss for the current validation step.
+        """
+
         self.eval()
         loss = self._validation_step(batch, batch_idx)
         self.log('val_loss', loss, prog_bar=True)
@@ -287,6 +337,17 @@ class ConvUNet(L.LightningModule):
         return loss
     
     def predict_step(self, batch, batch_idx, dataloader_idx: int = 0):
+        """
+        Prediction for the lightning module.
+
+        Args:
+            batch (torch.Tensor): The input batch.
+            batch_idx (int): The index of the batch.
+            dataloader_idx (int): The index of the dataloader.
+
+        Returns:
+            torch.Tensor: The prediction of current batch.
+        """
         output = self._predict_step(batch, batch_idx, dataloader_idx)
         return output
 
@@ -301,6 +362,13 @@ class ConvUNet(L.LightningModule):
 
     # -----------------------------------------------------------------------------
     def get_loss(self, y_hat, y):
+        """
+        To get the loss from the loss function
+
+        Returns:
+            torch.Tensor: The loss for the current step.
+        """
+
         loss = self.loss_func(y_hat, y)
         return loss
 

@@ -19,6 +19,16 @@ def custom_collate(batch):
     return default_collate(batch)
 
 def init_model(cfg:DictConfig):
+    """
+    Create model using parameters from config file.
+
+    Parameters:
+        cfg: DictConfig
+
+    Returns:
+        model: ConvUNet
+    """
+
     channels = cfg.image_channels
     c_factor = cfg.c_factor
     output_channels = cfg.output_channels
@@ -35,6 +45,18 @@ def init_model(cfg:DictConfig):
 
 
 def setup_dataloaders(cfg:DictConfig):
+    """
+    Create dataloaders using parameters from config file.
+
+    Parameters:
+        cfg: DictConfig
+
+    Returns:
+        train_dataloader: DataLoader.
+        validation_dataloader: DataLoader.
+        test_dataloader: DataLoader.
+    """
+
     dataset = BaseDataset(**cfg.dataset)
 
     split_ratios = cfg.split_ratios
@@ -46,12 +68,7 @@ def setup_dataloaders(cfg:DictConfig):
     train_size = int(dataset_size * train_ratio)
     val_size = int(dataset_size * val_ratio)
     test_size = dataset_size - train_size - val_size
-    '''
-    print(f"Dataset size: {dataset_size}")
-    print(f"Train size: {train_size}")
-    print(f"Validation size: {val_size}")
-    print(f"Test size: {test_size}")
-    '''
+
     train_dataset,validation_dataset,test_dataset = random_split(dataset,[train_size,val_size,test_size])
 
     train_dataloader = DataLoader(train_dataset, batch_size = cfg.train.batch_size, shuffle = True,collate_fn= custom_collate,pin_memory=True)
@@ -60,6 +77,15 @@ def setup_dataloaders(cfg:DictConfig):
     return train_dataloader,validation_dataloader,test_dataloader
 
 def setup_logger(cfg:DictConfig):
+    """
+    Create log to visualize training process.
+
+    Parameters:
+        cfg: DictConfig
+
+    Returns:
+        logger: TensorBoardLogger
+    """
     log_dir = os.getcwd() + cfg.train.log_dir
     if not os.path.exists(log_dir):
         os.mkdir(log_dir)
@@ -70,6 +96,12 @@ def setup_logger(cfg:DictConfig):
 
 
 def start_training(cfg: DictConfig):
+    """
+    Training process.
+
+    Parameters:
+        cfg: DictConfig
+    """
     model_cfg = cfg.model
     train_cfg = cfg.train
     myckpt_dir = os.getcwd() + train_cfg.save_dir

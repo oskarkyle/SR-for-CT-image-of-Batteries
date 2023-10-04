@@ -1,37 +1,53 @@
+###
+# Split ratios of dataset
 split_ratios:
   train: 0.7
   val: 0.2
   test: 0.1
 
+###
+# Training configs
 train:
   batch_size: 2
   epochs: 10
+  # path to save directory for model checkpoints
   save_dir: /model/checkpoints/
+  # name of the model checkpoint
   save_name: model_ch_mults_6_n_blocks_1_n_layers_1_epochs_10_sum
+  # path save directory for logs
   log_dir: /outputs/logs
   precision: 16
   callbacks: 
     monitor: val_loss
+    # number of checks with no improvement after which training will be stopped.
     patience: 200
+    # whether to stop training when the metric is at a minimum
     mode: min    
   lr: 0.0001
   accelerator: gpu
 
 check_dataset: True
 
+###
+# Dataset configs
 dataset:
   task: SR
   mode: train
+  # path to the root directory of the project
   data_root: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries
+  # path to the directory of the dataset
   dataset_dir: [/dataset/pristine, /dataset/cycled]
+  # size of each tile of slice in dataset
   tile_size: 512
+  # number of tiles in each row of slice
   tile_grid: 4
 
+  # preprocessing configs
   preprocess_cfg:
     convert_dtype: null
     binning:
       binning_factor: 8
-    
+  # transforms configs  
   transforms_cfg:
     propability: 1.0
     RandomAffine:
@@ -84,6 +100,8 @@ dataset:
         - 0.1
         - 1.1
 
+###
+# Model configs
 model:
   model_name: SR_model
   automatic_optimization: true
@@ -123,7 +141,11 @@ model:
     args:
       reduction: sum
 
+
+###
+# Inference configs
 pred:
+  # path to the model checkpoint
   ckpt_path: /model/checkpoints/model_ch_mults_6_n_blocks_1_n_layers_1_epochs_10_sum.ckpt
   device: mps
   output_dir: /results/
@@ -131,9 +153,8 @@ pred:
   slice: 1
   tiff_file_index: 1
   kernel_size: 5
+  # path to the train loss csv
   train_loss_csv: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries/outputs/csv/SR_model_4_train.csv
+  # path to the validation loss csv
   val_loss_csv: /Users/haoruilong/BA_code/SR_for_CT_image_of_Batteries/ouputs/csv/SR_model_4_val.csv
   loss_curve_name: SR_Model_4
-  want_range: 4
-  input_thesis: input_thesis
-  label_thesis: label_thesis
