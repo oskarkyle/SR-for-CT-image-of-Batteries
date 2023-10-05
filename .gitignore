@@ -9,3 +9,5 @@ dataset/
 results/
 outputs/
 model/checkpoints/*.ckpt
+pyexamples/*.pdf
+docs/build/latex/
