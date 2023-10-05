@@ -24,6 +24,8 @@ The model is trained on the dataset from paper *Multimodal Nanoscale Tomographic
 
    pred
 
+   plot
+
 
 Indices and tables
 ==================
